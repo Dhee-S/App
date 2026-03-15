@@ -223,7 +223,7 @@ export default function SchedulePage() {
                         background: ['radial-gradient(circle at 0% 0%, rgba(6,182,212,0.1) 0%, transparent 50%)', 'radial-gradient(circle at 100% 100%, rgba(6,182,212,0.15) 0%, transparent 50%)']
                       }}
                       transition={{ duration: 3, repeat: Infinity, repeatType: "reverse" }}
-                      className="absolute inset-0 pointer-events-none" 
+                      className="absolute inset-0" 
                     />
                     
                     <div className="p-5 flex items-start gap-4 relative z-10">
@@ -252,10 +252,10 @@ export default function SchedulePage() {
                              />
                           </div>
                           <p className="text-sm text-gray-700 font-medium leading-relaxed">
-                            Chef is orchestrating <b className="text-gray-900">{batch.dishes?.name || 'Gourmet Batch'}</b> for a private group. Join them?
+                            Chef is orchestrating <b className="text-gray-900">{batch.dishes?.name}</b> for a private group. Join them?
                           </p>
                           <p className="text-[10px] text-[#06B6D4] font-bold mt-2">
-                            Requested: {batch.quantity || 1} servings
+                            Requested: {batch.quantity} servings
                           </p>
                        </div>
                     </div>
@@ -264,10 +264,6 @@ export default function SchedulePage() {
                          whileHover={{ scale: 1.02 }}
                          whileTap={{ scale: 0.98 }}
                          onClick={() => {
-                           if (!batch.dishes) {
-                             showToast('Dish details missing from protocol.', 'error')
-                             return
-                           }
                            addItem({
                              id: batch.dishes.id,
                              name: batch.dishes.name,
@@ -450,6 +446,7 @@ export default function SchedulePage() {
               className="bg-white rounded-[2.5rem] w-full max-w-sm p-8 shadow-2xl relative overflow-hidden flex flex-col max-h-[80vh]"
               onClick={e => e.stopPropagation()}
             >
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#268C7F] to-teal-400" />
               <button 
                 onClick={() => setShowRequestModal(false)}
                 className="absolute top-6 right-6 w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-gray-800 transition-colors"
@@ -458,8 +455,11 @@ export default function SchedulePage() {
               </button>
 
               <div className="mb-6">
-                <h2 className="text-2xl font-black text-gray-800 tracking-tighter">Suggest a Dish</h2>
-                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1">For {format(selectedDate, 'MMM d')}</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles size={16} className="text-[#268C7F]" />
+                  <h2 className="text-2xl font-black text-gray-800 tracking-tighter">Suggest a Dish</h2>
+                </div>
+                <p className="text-xs text-gray-400 font-medium">For {format(selectedDate, 'EEEE, MMMM d')}</p>
               </div>
 
               <div className="relative mb-6">
