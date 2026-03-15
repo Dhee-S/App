@@ -1,17 +1,32 @@
-import { createClient } from '@/utils/supabase/server'
+'use client'
+
+import { createClient } from '@/utils/supabase/client'
 import { BentoCard } from '@/components/BentoCard'
 import { CheckCircle2, Clock, ChefHat, PackageCheck, ScrollText, History, Star } from 'lucide-react'
 import { format } from 'date-fns'
+import { useEffect, useState } from 'react'
 
-export default async function OrdersPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+export default function OrdersPage() {
+  const [orders, setOrders] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const supabase = createClient()
 
-  const { data: orders } = await supabase
-    .from('orders')
-    .select('*, order_items(*, dishes(*))')
-    .eq('user_id', user?.id || '00000000-0000-0000-0000-000000000000')
-    .order('created_at', { ascending: false })
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      const { data } = await supabase
+        .from('orders')
+        .select('*, order_items(*, dishes(*))')
+        .eq('user_id', user?.id || '00000000-0000-0000-0000-000000000000')
+        .order('created_at', { ascending: false })
+
+      setOrders(data || [])
+      setLoading(false)
+    }
+
+    fetchOrders()
+  }, [supabase])
 
   const activeOrders = orders?.filter(o => !['completed', 'cancelled'].includes(o.status)) || []
   const pastOrders = orders?.filter(o => ['completed', 'cancelled'].includes(o.status)) || []
@@ -79,7 +94,15 @@ export default async function OrdersPage() {
                      const Icon = item.icon
                      const isDone = step >= item.target
                      const isCurrent = step === item.target
-                     return (
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#268C7F] border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  return (
                         <div key={i} className={`relative z-10 flex items-center gap-6 transition-all duration-500 ${isDone ? 'opacity-100 scale-100' : 'opacity-40 scale-95'}`}>
                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-500 ${
                              isCurrent ? 'bg-[#268C7F] text-white shadow-lg ring-4 ring-[#268C7F]/10 scale-110' : 
