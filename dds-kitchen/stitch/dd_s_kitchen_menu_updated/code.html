@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DD's Kitchen - Menu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Arima+Madurai:wght@400;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Arima+Madurai:wght@400;700&amp;family=Trirong:wght@300;400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#9dd585",
+                        "accent-light": "#EEFABD",
+                        "accent-dark": "#263B6A",
+                        "background-light": "#f7f8f6",
+                        "background-dark": "#171e14",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"],
+                        "arima": ["Arima Madurai"],
+                        "trirong": ["Trirong"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }</script>
+<style>.glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .bg-blur-gradient {
+            background: radial-gradient(circle at 0% 0%, #eefabd 0%, transparent 50%),
+                        radial-gradient(circle at 100% 100%, #a0d585 0%, transparent 50%);
+        }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100"><div class="fixed inset-0 -z-10 bg-blur-gradient opacity-40"></div>
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Header -->
+<header class="p-4 space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">restaurant_menu</span>
+<h1 class="font-arima text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">DD's Kitchen</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/50 glass-card">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<!-- Category Tabs -->
+<nav class="sticky top-0 z-40 bg-white/30 backdrop-blur-md border-b border-white/20">
+<div class="flex px-4 gap-6 overflow-x-auto no-scrollbar">
+<a class="flex flex-col items-center justify-center border-b-2 border-primary text-slate-900 dark:text-slate-100 pb-3 pt-4 whitespace-nowrap" href="#">
+<p class="text-sm font-trirong font-bold tracking-wide">All</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent text-slate-500 dark:text-slate-400 pb-3 pt-4 whitespace-nowrap hover:text-primary" href="#">
+<p class="text-sm font-trirong font-bold tracking-wide">Breakfast</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent text-slate-500 dark:text-slate-400 pb-3 pt-4 whitespace-nowrap hover:text-primary" href="#">
+<p class="text-sm font-trirong font-bold tracking-wide">Main Course</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent text-slate-500 dark:text-slate-400 pb-3 pt-4 whitespace-nowrap hover:text-primary" href="#">
+<p class="text-sm font-trirong font-bold tracking-wide">Desserts</p>
+</a>
+</div>
+</nav>
+<!-- Menu Grid -->
+<main class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
+<!-- Item 1 -->
+<div class="glass-card rounded-xl overflow-hidden flex flex-col group transition-transform hover:scale-[1.02]">
+<div class="relative aspect-video w-full overflow-hidden">
+<div class="absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 group-hover:scale-110" data-alt="Fresh avocado toast with poached eggs and seeds" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC3FFwaDpBA2JeoxMKQMnSNKfDaMZ4dZGUhV6rvJc_JGE0YhB9ZVWQ427cw58KGFRiLsjcEMbLs6to83ln2fxbVJo9xYyRSK8cIsMqY0nqxtUasQjkvn0tobtR6YwW7J_C66fNzvJ84wdBnwsBJ-7TX53fm6eiqWOXbwNuzHgzXmafVUHSZDwLijv1upDpztzn0bvHzq1QuCVT-51ejR5SUPzlxCakbK63HLkWC4WvyDbzy-5pQqoKDr6Imk7GkJ_hLfcXvDbtpBCQ");'></div>
+<div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-yellow-500 text-sm fill-1">star</span>
+<span class="text-xs font-bold text-slate-800">4.8</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<h3 class="font-arima text-xl font-bold text-slate-900 mb-1">Signature Avocado Toast</h3>
+<p class="font-trirong text-slate-500 text-sm mb-4 flex-1">Sourdough bread, mashed avocado, chili flakes, and a perfectly poached egg.</p>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-lg font-bold text-primary">$12.00</span>
+<button class="bg-primary hover:bg-primary/90 text-slate-900 px-6 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">add</span>
+                            Add
+                        </button>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="glass-card rounded-xl overflow-hidden flex flex-col group transition-transform hover:scale-[1.02]">
+<div class="relative aspect-video w-full overflow-hidden">
+<div class="absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 group-hover:scale-110" data-alt="Stack of fluffy pancakes with syrup and berries" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDqx94D9k1y1MeKaWO82DzRPeTDUXm39zIF8I_ggYsdRi_CfVga4unDM6Ry2hnmYjZC-z8y9VmhsKG0ITQbMbabJLqvcfBb3geEWRGbO-a1GcwRmWPz91HdMV-h515PGAplCd1jwG5e5xuqYpAArpB7fbl9GSs5k5Qgpg5aVhASEWVw_pE51hKg_A9Kd6fvb1RmI77fAq3d9ZczqMBW3OMRt2ZG4mJ_OOar5ib0O2NVgp7BfV2TtVogI7jBVfhempdVz0eSygsyHkc");'></div>
+<div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-yellow-500 text-sm fill-1">star</span>
+<span class="text-xs font-bold text-slate-800">4.9</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<h3 class="font-arima text-xl font-bold text-slate-900 mb-1">Fluffy Buttermilk Pancakes</h3>
+<p class="font-trirong text-slate-500 text-sm mb-4 flex-1">Triple stack served with organic maple syrup and fresh seasonal berries.</p>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-lg font-bold text-primary">$10.50</span>
+<button class="bg-primary hover:bg-primary/90 text-slate-900 px-6 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">add</span>
+                            Add
+                        </button>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="glass-card rounded-xl overflow-hidden flex flex-col group transition-transform hover:scale-[1.02]">
+<div class="relative aspect-video w-full overflow-hidden">
+<div class="absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 group-hover:scale-110" data-alt="Healthy buddha bowl with salmon and quinoa" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA9Q2Ak3mv79DjXmETSZOQNh7CtKjbknuaa_-QPYD6_oBLqUPl6SXVOzTZfS8BuYqr8PE-kcgMdFcV6b2MVHuvsQXHMD9gM2aV0d7gikSHilYbQBzKRiruPZAeDMOhuggSt-Mx-4VbelOs3NCfRDquGEGnjxwbX3bL9NLDNg1jxpfjItzjMslNT40TcZ1OhZlrRzHDnXgkVPsZAlQ0OZuxYQ0iG5ZeDk2bhxg2GD3Z5T2tC599znGUxwiQtglfs303OvQU7IjZjNSk");'></div>
+<div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-yellow-500 text-sm fill-1">star</span>
+<span class="text-xs font-bold text-slate-800">4.7</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<h3 class="font-arima text-xl font-bold text-slate-900 mb-1">Garden Buddha Bowl</h3>
+<p class="font-trirong text-slate-500 text-sm mb-4 flex-1">Quinoa base, roasted chickpeas, kale, avocado, and tahini dressing.</p>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-lg font-bold text-primary">$14.50</span>
+<button class="bg-primary hover:bg-primary/90 text-slate-900 px-6 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">add</span>
+                            Add
+                        </button>
+</div>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="glass-card rounded-xl overflow-hidden flex flex-col group transition-transform hover:scale-[1.02]">
+<div class="relative aspect-video w-full overflow-hidden">
+<div class="absolute inset-0 bg-center bg-no-repeat bg-cover transition-transform duration-500 group-hover:scale-110" data-alt="Chocolate lava cake with vanilla ice cream" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCCeT_nKLyGo5ndaXhC4yjaT3j9D2Kh_7EBSFCp4xKVoRDr98Fs9qzq2MGj73Y8QwVF4V-DNpYWYsNqVHYxZkz727Ac7AbXBMfvRpwmlPN-ek69RrnNXPef6OFhdLO1_VpxmMABxml_TUhV3qSmIWKuIvRKkH3u3BMcczWPmMM69sx7RtHvM9e4mMJdKbYZZJuykfKrDFc4nqLdVJRqgVn_f11pAhJoZs-IvdWKvPespmnwn2lyMgrNb01ClCyqMm6L11qNF49JCL0");'></div>
+<div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-yellow-500 text-sm fill-1">star</span>
+<span class="text-xs font-bold text-slate-800">5.0</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<h3 class="font-arima text-xl font-bold text-slate-900 mb-1">Molten Chocolate Cake</h3>
+<p class="font-trirong text-slate-500 text-sm mb-4 flex-1">Warm dark chocolate center, served with Madagascan vanilla bean ice cream.</p>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-lg font-bold text-primary">$8.00</span>
+<button class="bg-primary hover:bg-primary/90 text-slate-900 px-6 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">add</span>
+                            Add
+                        </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 glass-card border-t border-white/20 px-6 py-3 z-50 rounded-t-xl">
+<div class="max-w-md mx-auto flex items-center justify-between">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-current">restaurant</span>
+<span class="text-[10px] font-bold uppercase tracking-wider font-trirong">Menu</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-[10px] font-bold uppercase tracking-wider font-trirong">Orders</span>
+</a>
+<div class="relative -mt-12">
+<button class="w-14 h-14 bg-primary rounded-full shadow-lg shadow-primary/40 flex items-center justify-center border-4 border-background-light">
+<span class="material-symbols-outlined text-white text-3xl">add_shopping_cart</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<div class="relative">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[8px] font-bold text-slate-900">2</span>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-wider font-trirong">Cart</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-wider font-trirong">Profile</span>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

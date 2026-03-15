@@ -1,0 +1,201 @@
+@import "tailwindcss";
+
+:root {
+  /* Bright Theme Colors */
+  --primary: #268C7F;
+  --secondary: #E1803A;
+  --accent: #CE9146;
+  --bg-light: #FAFAF8;
+  --bg-cream: #F5F3EF;
+  --bg-white: #FFFFFF;
+  --text-dark: #1A1A1A;
+  --text-gray: #6B7280;
+  --text-muted: #9CA3AF;
+
+  /* Mappings */
+  --background: var(--bg-light);
+  --foreground: var(--text-dark);
+  --color-matte-teal: var(--primary);
+  --color-matte-cyan: var(--secondary);
+  --color-matte-orange: var(--secondary);
+  --color-matte-amber: var(--accent);
+  --color-bento-bg: rgba(255, 255, 255, 0.8);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-bg-light: var(--bg-light);
+  --color-bg-cream: var(--bg-cream);
+  --color-bg-white: var(--bg-white);
+  
+  --font-display: var(--font-jakarta);
+  --font-heading: var(--font-arima);
+  --font-subheading: var(--font-trirong);
+  --font-body: var(--font-merriweather);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Bright Glassmorphism */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(38, 140, 127, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Bright Mesh Background */
+.mesh-bg {
+  background-color: var(--bg-light);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(38, 140, 127, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(225, 128, 58, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(206, 145, 70, 0.06) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+/* Custom Classic Scrollbar - Adapting to Bright Gourmet Theme */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(38, 140, 127, 0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(38, 140, 127, 0.2) transparent;
+}
+
+/* ReactBits Inspired Minimalist Utilities */
+
+/* Noise/Grain Overlay */
+.noise-overlay::after {
+  content: "";
+  position: fixed;
+  top: -150%;
+  left: -150%;
+  width: 300%;
+  height: 300%;
+  pointer-events: none;
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  opacity: 0.12;
+  z-index: 9999;
+}
+
+/* Shiny Text Effect */
+.shiny-text {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: shine 3s infinite linear;
+}
+
+@keyframes shine {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Spotlight Card Effect */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(38, 140, 127, 0.08) 0%,
+    transparent 80%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+/* Aurora Background Layer */
+.aurora {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
+  opacity: 0.5;
+  filter: blur(100px);
+}
+
+.aurora-blob {
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: var(--primary);
+  opacity: 0.1;
+  animation: float 20s infinite alternate;
+}
+
+.aurora-blob-2 {
+  position: absolute;
+  right: -10%;
+  bottom: -10%;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: var(--secondary);
+  opacity: 0.1;
+  animation: float 25s infinite alternate-reverse;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(10%, 10%) scale(1.1); }
+}

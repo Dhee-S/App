@@ -1,0 +1,193 @@
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Arima:wght@400;700&amp;family=Trirong:wght@400;500&amp;family=Merriweather:wght@300;400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#9dd585",
+                        "background-light": "#f7f8f6",
+                        "background-dark": "#171e14",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "heading": ["Arima", "cursive"],
+                        "subheading": ["Trirong", "serif"],
+                        "body": ["Merriweather", "serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-bg {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .gradient-mesh {
+            background-color: #f7f8f6;
+            background-image: 
+                radial-gradient(at 0% 0%, #EEFABD 0px, transparent 50%),
+                radial-gradient(at 100% 100%, #A0D585 0px, transparent 50%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark min-h-screen gradient-mesh">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<header class="flex items-center justify-between p-4 bg-white/30 backdrop-blur-md sticky top-0 z-50">
+<div class="flex items-center gap-2">
+<div class="bg-primary text-white p-2 rounded-lg">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<h1 class="font-heading text-2xl font-bold text-slate-900 dark:text-slate-100">DD's Kitchen</h1>
+</div>
+<div class="size-10 rounded-full bg-primary/20 border-2 border-primary/50 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-primary">account_circle</span>
+</div>
+</header>
+<main class="flex-1 flex flex-col gap-6 p-4">
+<section class="w-full">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full h-12 pl-12 pr-4 bg-white/60 dark:bg-slate-800/60 border-none rounded-xl focus:ring-2 focus:ring-primary shadow-sm font-body" placeholder="Search inventory items..." type="text"/>
+</div>
+</section>
+<nav class="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+<button class="shrink-0 px-5 py-2 rounded-full bg-primary text-white font-medium text-sm">All</button>
+<button class="shrink-0 px-5 py-2 rounded-full bg-white/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-200 font-medium text-sm hover:bg-primary/20">Fresh Produce</button>
+<button class="shrink-0 px-5 py-2 rounded-full bg-white/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-200 font-medium text-sm hover:bg-primary/20">Meat &amp; Dairy</button>
+<button class="shrink-0 px-5 py-2 rounded-full bg-white/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-200 font-medium text-sm hover:bg-primary/20">Dry Goods</button>
+<button class="shrink-0 px-5 py-2 rounded-full bg-white/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-200 font-medium text-sm hover:bg-primary/20">Beverages</button>
+</nav>
+<section class="grid grid-cols-1 gap-4">
+<div class="glass-bg rounded-xl p-3 flex gap-4 shadow-sm">
+<div class="w-24 h-24 rounded-lg bg-cover bg-center shrink-0" data-alt="Fresh organic red tomatoes in basket" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBesHT32pWnW2mmrQZ2KC-D2YaDlYWgtB1HqurmNPQFB_MLOeM20p-PqNyGaQOuUNS-_-HXFM4j6rgxgXqtLyTxRl56Y9AFBNCd259GJZ9LKopB7Q4FKBtBU5TXdS0ZWk3qEfkAaFRxw5IzKeuYIlpfSizdedXfMZSV7r4-bqXj5Q_ENE9wP9e8RZkQuNjhZInMv4f2c96p8BKZWEEIBNbOvmd9YGVNMj3oB2aSbkR2mxApFFmikzVXPYbTLSrLsvUlpC8RDFs0d34')"></div>
+<div class="flex-1 flex flex-col justify-between py-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="font-subheading font-semibold text-lg text-slate-900">Organic Tomatoes</h3>
+<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">In Stock</span>
+</div>
+<p class="font-body text-sm text-slate-500 mt-0.5">Current Stock: 15 kg</p>
+</div>
+<div class="flex justify-end">
+<button class="flex items-center gap-1 text-primary font-semibold text-sm">
+<span class="material-symbols-outlined text-sm">edit</span>
+                                Update
+                            </button>
+</div>
+</div>
+</div>
+<div class="glass-bg rounded-xl p-3 flex gap-4 shadow-sm border-l-4 border-orange-400">
+<div class="w-24 h-24 rounded-lg bg-cover bg-center shrink-0" data-alt="Fresh carton of whole milk" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAgR4DlI6ffekeNKJt8M3ASz8LXfhrHb-3dG2aQQD5OGVYO6UqXH0xnyOqj_eOMEnT_5CeoG8tEjx-AdFraR3Vy_CswMNnrrgkosxWQoqW0Ds6uKXDbJIDbRjv3e5UaWqoa9713ZNM4VVV4bGwf0-udle8dOxIMcCRO9ShdqI0k12O_L0D0ppy2RMy_VUiINsL4RUj1eWK4nq03rzxLXy5dJ9wRubE9o8o9YVP30-qIWtfux4udhrhIsr-w9MehAIz996va3NDYNCE')"></div>
+<div class="flex-1 flex flex-col justify-between py-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="font-subheading font-semibold text-lg text-slate-900">Whole Milk</h3>
+<span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Low Stock</span>
+</div>
+<p class="font-body text-sm text-slate-500 mt-0.5">Current Stock: 4 Liters</p>
+</div>
+<div class="flex justify-between items-center">
+<button class="flex items-center gap-1 text-slate-400 font-semibold text-sm">
+<span class="material-symbols-outlined text-sm">edit</span>
+                                Edit
+                            </button>
+<button class="bg-primary text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:brightness-105 active:scale-95 transition-all">RESTOCK</button>
+</div>
+</div>
+</div>
+<div class="glass-bg rounded-xl p-3 flex gap-4 shadow-sm">
+<div class="w-24 h-24 rounded-lg bg-cover bg-center shrink-0" data-alt="A pack of fresh chicken breasts" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAyG-uuN9VMrcU8oU_QiL24HDeBPU_z7wUgUX5l9GgeS4z_aPoROGI0WJ0MpVEDVmUh3kp-tE3fSW3Lvy-dyqebv3vJK8HsEcAxrBs7OnNcEZ0KJOj3srstJ0gA9NkrpArUyGGJvDECcS8DL1rnpF4I9_jI7zcrnBVJhTnjDXvidToLNAyVw2jSVNPePBnfTxhDNcUGDs8S9534D7dW-N6kJkMGsc2qQSaJrK99_OJYgC9XrKxV4MBaWrKeWiu3BGqQFdf4tEzRusI')"></div>
+<div class="flex-1 flex flex-col justify-between py-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="font-subheading font-semibold text-lg text-slate-900">Chicken Breast</h3>
+<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">In Stock</span>
+</div>
+<p class="font-body text-sm text-slate-500 mt-0.5">Current Stock: 12 kg</p>
+</div>
+<div class="flex justify-end">
+<button class="flex items-center gap-1 text-primary font-semibold text-sm">
+<span class="material-symbols-outlined text-sm">edit</span>
+                                Update
+                            </button>
+</div>
+</div>
+</div>
+<div class="glass-bg rounded-xl p-3 flex gap-4 shadow-sm border-l-4 border-red-500">
+<div class="w-24 h-24 rounded-lg bg-cover bg-center shrink-0 grayscale opacity-60" data-alt="Freshly roasted coffee beans" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCRB1P7_vPK50wOAQ8ItOHOcMRerCfwjQJvzP673X1ovvgm7dswgHNHq1sLHZjELPkKl3NHSIdMTlALnenWDJjW-qYW_BMahU-wg8x1P1ruj8ImD-GZBPnCHwkUM7vlr-LVRQz5ZDB8SN4b7lfgXM_IRNfmqILaHw8QToqmfWWXY4VJSRIShi_mcNvizgmoWqxfZszMYaRhnInzp8STWA1732jDIOXWe-yelyH9_x9esQ_brOgT2LIHJGjixdDAA9kO3h2C0dRuw0U')"></div>
+<div class="flex-1 flex flex-col justify-between py-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="font-subheading font-semibold text-lg text-slate-900">Avocado</h3>
+<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Out of Stock</span>
+</div>
+<p class="font-body text-sm text-slate-500 mt-0.5">Current Stock: 0 units</p>
+</div>
+<div class="flex justify-between items-center">
+<button class="flex items-center gap-1 text-slate-400 font-semibold text-sm">
+<span class="material-symbols-outlined text-sm">edit</span>
+                                Edit
+                            </button>
+<button class="bg-red-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:brightness-105 active:scale-95 transition-all">RESTOCK</button>
+</div>
+</div>
+</div>
+<div class="glass-bg rounded-xl p-3 flex gap-4 shadow-sm">
+<div class="w-24 h-24 rounded-lg bg-cover bg-center shrink-0" data-alt="Multiple bottles of sparkling water" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCi-GzK51fJdEBBvf9oZuk4p8LdGPNCNVg1gCe7dzCXnEJsEuTcc8YBoWCQGXxvCZHTEQYP2YIqah2oFKv7cDTPs4DTwrLsp4sHrEdP4Pjz8vzXhlOUx9oKbO4qxGcst0ZUCNSU03MUdoYKhQTKIqrMoVBarPkU7-zKNyZIFz4w1fwuyBeVmvGX-zqig3iAObslM_EtFjeYdDvsEJigGDkh_9A4W0h7N9PbCbytqBOjsW9f5K7PCmZdd5QQWUrez3RuM-PcqvgJHe8')"></div>
+<div class="flex-1 flex flex-col justify-between py-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="font-subheading font-semibold text-lg text-slate-900">Sparkling Water</h3>
+<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">In Stock</span>
+</div>
+<p class="font-body text-sm text-slate-500 mt-0.5">Current Stock: 48 units</p>
+</div>
+<div class="flex justify-end">
+<button class="flex items-center gap-1 text-primary font-semibold text-sm">
+<span class="material-symbols-outlined text-sm">edit</span>
+                                Update
+                            </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="sticky bottom-0 bg-white/80 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 py-1 flex justify-between items-center shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+<a class="flex flex-1 flex-col items-center gap-1 py-2 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-[10px] font-medium uppercase tracking-tight">Home</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 py-2 text-slate-400" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<p class="text-[10px] font-medium uppercase tracking-tight">Orders</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 py-2 text-primary" href="#">
+<div class="relative">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">inventory_2</span>
+<div class="absolute -top-1 -right-1 size-2 bg-red-500 rounded-full border border-white"></div>
+</div>
+<p class="text-[10px] font-bold uppercase tracking-tight">Stock</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 py-2 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-[10px] font-medium uppercase tracking-tight">Setup</p>
+</a>
+</footer>
+</div>
+</body></html>

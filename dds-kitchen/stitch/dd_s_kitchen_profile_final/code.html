@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DD's Kitchen - Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Arima+Madurai:wght@400;700&amp;family=Trirong:wght@300;500&amp;family=Merriweather:wght@300;400&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#9dd585",
+                        "background-light": "#f7f8f6",
+                        "background-dark": "#171e14",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"],
+                        "head": ["Arima Madurai"],
+                        "subhead": ["Trirong"],
+                        "sub": ["Merriweather"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-card {
+            background: rgba(23, 30, 20, 0.7);
+            border: 1px solid rgba(157, 213, 133, 0.1);
+        }
+        .hero-gradient {
+            background: radial-gradient(circle at top right, rgba(157, 213, 133, 0.15), transparent),
+                        radial-gradient(circle at bottom left, rgba(157, 213, 133, 0.1), transparent);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<header class="sticky top-0 z-50 glass-card px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary cursor-pointer">arrow_back</span>
+<h1 class="font-head text-2xl font-bold text-slate-900 dark:text-slate-100">DD's Kitchen</h1>
+</div>
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-700 dark:text-slate-300">settings</span>
+</button>
+</header>
+<main class="flex-1 hero-gradient overflow-y-auto pb-24">
+<section class="flex flex-col items-center px-6 pt-8 pb-6">
+<div class="relative">
+<div class="w-32 h-32 rounded-full border-4 border-primary/30 p-1">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="Professional chef portrait in white uniform" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBwClgJ84fvwaM5Wjwym7OffWmelMsx__J2Vfu4PUhruHa5QlPmbfcHdyT8XFjbLE00NXVJcLQxeT-Nd659kv7slFLe-QHrHhD6mHCJSG8eQVKvzhTdaTp0dWUmhwZNuVZqpLm4ILelPUn0JFn9USsl8La9YXUK0OZ0xL1cMfW0lawSzII8WvRAq-PELO-dAWGvMlpnJuB8o7ULrrw8ekK0ixUZz-LP0smKv1vi3vIHSXyNR0dqXbaX4gIfVkWyIsu6IDwldPPYUNc')"></div>
+</div>
+<div class="absolute bottom-1 right-1 bg-primary text-white p-1.5 rounded-full border-2 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined text-sm block">edit</span>
+</div>
+</div>
+<h2 class="font-head text-3xl font-bold mt-4">DD's Kitchen</h2>
+<p class="font-subhead text-primary font-medium">Master Chef • 4.9 stars</p>
+<p class="font-sub text-slate-500 dark:text-slate-400 text-sm italic">Member since Oct 2023</p>
+<div class="flex gap-4 w-full max-w-md mt-8">
+<div class="flex-1 glass-card rounded-xl p-4 text-center">
+<p class="text-xl font-bold text-primary">120</p>
+<p class="text-xs font-subhead uppercase tracking-wider text-slate-500">Recipes</p>
+</div>
+<div class="flex-1 glass-card rounded-xl p-4 text-center">
+<p class="text-xl font-bold text-primary">15k</p>
+<p class="text-xs font-subhead uppercase tracking-wider text-slate-500">Followers</p>
+</div>
+<div class="flex-1 glass-card rounded-xl p-4 text-center">
+<p class="text-xl font-bold text-primary">42</p>
+<p class="text-xs font-subhead uppercase tracking-wider text-slate-500">Orders</p>
+</div>
+</div>
+</section>
+<section class="px-6 space-y-4">
+<h3 class="font-subhead font-bold text-lg text-slate-800 dark:text-slate-200 ml-1">Account Settings</h3>
+<div class="glass-card rounded-2xl overflow-hidden divide-y divide-slate-200/50 dark:divide-slate-700/50">
+<a class="flex items-center justify-between p-4 hover:bg-primary/5 transition-colors" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-display font-semibold">Personal Information</p>
+<p class="font-sub text-xs text-slate-500">Name, email, and phone</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</a>
+<a class="flex items-center justify-between p-4 hover:bg-primary/5 transition-colors" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<div>
+<p class="font-display font-semibold">Saved Addresses</p>
+<p class="font-sub text-xs text-slate-500">Home, work, and other spots</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</a>
+<a class="flex items-center justify-between p-4 hover:bg-primary/5 transition-colors" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<p class="font-display font-semibold">Payment Methods</p>
+<p class="font-sub text-xs text-slate-500">Cards, wallets, and UPI</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</a>
+</div>
+<h3 class="font-subhead font-bold text-lg text-slate-800 dark:text-slate-200 ml-1 pt-4">Support &amp; More</h3>
+<div class="glass-card rounded-2xl overflow-hidden divide-y divide-slate-200/50 dark:divide-slate-700/50">
+<a class="flex items-center justify-between p-4 hover:bg-primary/5 transition-colors" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">help</span>
+</div>
+<div>
+<p class="font-display font-semibold">Help Center</p>
+<p class="font-sub text-xs text-slate-500">FAQs and contact support</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</a>
+<a class="flex items-center justify-between p-4 hover:bg-primary/5 transition-colors" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div>
+<p class="font-display font-semibold">Terms &amp; Privacy</p>
+<p class="font-sub text-xs text-slate-500">Our legal policies</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</a>
+</div>
+<button class="w-full mt-8 py-4 px-6 rounded-2xl bg-white dark:bg-background-dark border border-red-200 dark:border-red-900/30 text-red-500 font-display font-bold flex items-center justify-center gap-2 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </button>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 right-0 glass-card border-t border-slate-200/50 dark:border-slate-800/50 px-6 pb-6 pt-3 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Search</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">person</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Profile</span>
+</a>
+</nav>
+</body></html>

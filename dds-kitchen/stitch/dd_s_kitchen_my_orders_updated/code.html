@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Orders - DD's Kitchen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#9dd585",
+                        "background-light": "#f7f8f6",
+                        "background-dark": "#171e14",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"],
+                        "arima": ["Arima Madurai"],
+                        "trirong": ["Trirong"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .bg-blur-gradient {
+            background: radial-gradient(circle at 0% 0%, #eefabd 0%, transparent 50%),
+                        radial-gradient(circle at 100% 100%, #a0d585 0%, transparent 50%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<link href="https://fonts.googleapis.com/css2?family=Arima+Madurai:wght@400;700&amp;family=Trirong:wght@300;400;500&amp;display=swap" rel="stylesheet"/></head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
+<header class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">arrow_back</span>
+<h1 class="font-arima text-2xl font-bold tracking-tight">My Orders</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/50 glass-card">
+<span class="material-symbols-outlined">search</span>
+</button>
+</header><div class="fixed inset-0 -z-10 bg-blur-gradient opacity-40"></div>
+<main class="flex-1 pb-24">
+<div class="sticky top-[72px] z-10 glass-card mb-4">
+<div class="flex border-b border-primary/10 px-4 justify-between">
+<a class="flex flex-col items-center justify-center border-b-[3px] border-primary text-slate-900 dark:text-slate-100 pb-3 pt-4 flex-1" href="#">
+<p class="text-sm font-bold font-trirong">Active</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-transparent text-slate-500 pb-3 pt-4 flex-1" href="#">
+<p class="text-sm font-bold font-trirong">Completed</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-transparent text-slate-500 pb-3 pt-4 flex-1" href="#">
+<p class="text-sm font-bold font-trirong">Cancelled</p>
+</a>
+</div>
+</div>
+<section class="px-4 py-2">
+<h3 class="font-bold mb-4 font-arima text-xl">Current Order</h3>
+<div class="glass-card rounded-xl overflow-hidden shadow-sm p-4">
+<div class="flex flex-col @container">
+<div class="w-full aspect-video rounded-lg overflow-hidden relative mb-4">
+<img alt="Freshly prepared meal" class="w-full h-full object-cover" data-alt="Delicious gourmet healthy meal plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUN34jY8sM_8NH8uqcjVRMFBqce9-g4blRO0qj5Tvjgd9IypHaKmYRlSY0mh72m5icPw2AXWIVp9ZBS-ZFYMvmWpgUfBX71BgbpVNchIcdj7L5d4zG_q76unApNez3LbNSPaJk-fi3Bhcey1mfUJtDH6nmogqBUqE23DBQ5fEuNpZ5rPA7ciP7i_dM0RzYZdOa0u1hZBV5tDuLlR99o-MGOcQMoJDbeTqS0xkpPAphiZ3mJ3h_mlEoowbMaXGWB7ESqGC0MeMQlw8"/>
+<div class="absolute top-3 right-3 bg-primary text-slate-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                                Preparing
+                            </div>
+</div>
+<div class="flex flex-col gap-3">
+<div>
+<p class="text-xs font-semibold text-primary uppercase tracking-wider mb-1 font-trirong">Order #DK-9283</p>
+<p class="text-xl font-bold font-trirong">Healthy Buddha Bowl</p>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-1 font-trirong">Expected in 25 mins • DD's Kitchen Central</p>
+</div>
+<div class="flex items-center gap-3 mt-2">
+<button class="flex-1 bg-primary hover:bg-primary/90 text-slate-900 font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-md font-trirong">
+<span class="material-symbols-outlined text-sm font-trirong">map</span>
+<span class="font-trirong">Track Live Map</span>
+</button>
+<button class="size-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary font-trirong">
+<span class="material-symbols-outlined font-trirong">call</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="px-4 py-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-bold font-arima text-xl">Past Orders</h3>
+<button class="text-primary text-sm font-bold font-trirong">View All</button>
+</div>
+<div class="space-y-4">
+<div class="glass-card rounded-xl p-4 flex gap-4 items-center">
+<div class="size-16 rounded-lg overflow-hidden shrink-0">
+<img alt="Salad Bowl" class="w-full h-full object-cover" data-alt="Green avocado salad bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMfwP6GoSYblBozRRz4gaNs5QwMEeMbAH6Ow4ISwrl93MbBq9e1dS8viVVI640JHHnPa3M58oQ6n55W7Oe6u9HfhRfpoybowdgmfDFyTa1-GWH342eW8t1i_yqFwGpiJJSLLV4C8jztxSypt46gWSjAzSa7DOHrpdACkJGbJI9kgWNjoItEyDyt14p7TLlI9fi0h2_IdMokeZ2hjxVih5zTkN0WAKVKKsQUe7hbI6bzNVlH7yXq3pGmE0HCKRegJwc0NRlgo4dlt0"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-bold text-base font-trirong">Quinoa Power Salad</p>
+<p class="text-xs text-slate-500 font-trirong">12 Oct, 18:45 • Delivered</p>
+</div>
+<p class="font-bold text-primary font-trirong">$14.50</p>
+</div>
+<div class="flex mt-3">
+<button class="text-xs font-bold border border-primary/30 rounded-lg px-4 py-1.5 hover:bg-primary/10 transition-colors font-trirong">
+                                    Reorder
+                                </button>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-xl p-4 flex gap-4 items-center">
+<div class="size-16 rounded-lg overflow-hidden shrink-0">
+<img alt="Keto Meal" class="w-full h-full object-cover" data-alt="Keto friendly egg and vegetable plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxI3zB_bmK53hG1dX61gMHKwyBrWjWZEHtWORoJ1f4kdpVodpaflV6zKCnDD4NyYIy5SYoHuPA9xabWxroPfGSCGLGyS0fI8Vt65FF8J9safd8sS1B0EmrxzXnt3Bl3Aj-M30xPMHCDP9ztHYPmER6DtuJL-MfXJFhp6T2Xdd3Nskkb94E6rOX6rrIz4yv6DgH8RmoOYiGI76vAfPOWxsNfrTpPVhIj0XuI3YNOFDM2wmlrfRnt2Fmb7GHAvcF2YzTZNBwHCm9tJs"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-bold text-base font-trirong">Classic Keto Breakfast</p>
+<p class="text-xs text-slate-500 font-trirong">08 Oct, 09:12 • Delivered</p>
+</div>
+<p class="font-bold text-primary font-trirong">$12.00</p>
+</div>
+<div class="flex mt-3">
+<button class="text-xs font-bold border border-primary/30 rounded-lg px-4 py-1.5 hover:bg-primary/10 transition-colors font-trirong">
+                                    Reorder
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 right-0 glass-card border-t border-white/20 px-6 py-3 z-50 rounded-t-xl">
+<div class="max-w-md mx-auto flex items-center justify-between">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold uppercase tracking-wider font-trirong">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-current">receipt_long</span>
+<span class="text-[10px] font-bold uppercase tracking-wider font-trirong">Orders</span>
+</a>
+<div class="relative -mt-12">
+<button class="w-14 h-14 bg-primary rounded-full shadow-lg shadow-primary/40 flex items-center justify-center border-4 border-background-light">
+<span class="material-symbols-outlined text-white text-3xl">add_shopping_cart</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">local_offer</span>
+<span class="text-[10px] font-bold uppercase tracking-wider font-trirong">Offers</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-wider font-trirong">Profile</span>
+</a>
+</div>
+</nav>
+</div>
+</body></html>
