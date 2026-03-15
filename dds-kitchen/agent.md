@@ -2,6 +2,18 @@
 
 This plan details the architecture and step-by-step implementation for the "DD's Kitchen" platform, divided into the **Customer (Gourmet Marketplace)** and the **Manager (Command Center)** interfaces. 
 
+## 🌐 Hosting & URLs
+- **Live Production URL**: [https://dhee-s.github.io/App/](https://dhee-s.github.io/App/)
+- **Local Development**: `http://localhost:3000/App/` (Note: `basePath` is active even locally)
+- **Supabase Project**: `obrzfvcaaidyzhbzsdqa`
+
+## 🛠️ Deployment Workflow
+The project is hosted on **GitHub Pages** using a **Static Export** strategy.
+1. **Build Process**: Handled by GitHub Actions ([nextjs.yml](file:///d:/Code/App/.github/workflows/nextjs.yml)).
+2. **Subfolder Handling**: The app is located in the `dds-kitchen/` directory. 
+3. **Routing**: `basePath: '/App'` and `trailingSlash: true` are configured in `next.config.ts`.
+4. **Auth Recovery**: Uses a client-side `AuthGuard.tsx` and `auth-client.ts` for all Supabase interactions to support static hosting.
+
 ## Technology Stack
 - **Frontend Framework**: Next.js (App Router) with React
 - **Styling**: Tailwind CSS with custom theme extensions for the DD's Kitchen design system
@@ -51,9 +63,13 @@ We are using the expanded schema provided by the user:
 ## User Review Required
 None for now. We are proceeding with the provided Supabase project (`obrzfvcaaidyzhbzsdqa`) and the setup.
 
-## Authentication
-- Manager uses Magic Link (1-time login)
-- Customers use Email and Password auth (to create persistent accounts)
+## Authentication & Redirection
+- **Role-Based Redirection**: Handled via `AuthGuard.tsx` (Client-side).
+  - **Unauthenticated**: Redirected to `/App/login/`.
+  - **Managers**: Redirected to `/App/admin/dash/` after login or when visiting `/App/`.
+  - **Customers**: Redirected to `/App/` (Gourmet Marketplace).
+- **Manager Access**: Uses Magic Link (Email) for staff or Dev 1-Click login.
+- **Customer Access**: Standard Email/Password registration and login.
 
 ## Proposed Changes
 
@@ -99,13 +115,12 @@ Develop reusable components based on the Stitch designs using the extracted desi
 ## Verification Plan
 
 ### Automated Tests
-- End-to-end testing of the "Cart to Verification" flow using Playwright/Cypress.
-- Unit tests for the "Join Batch" logic verifying that joining updates existing requests instead of creating duplicate dates.
+- End-to-end testing of the "Cart to Verification" flow.
+- Deployment verification: Ensuring `_next` assets load correctly via `basePath`.
 
-### Manual Verification
-1. I will boot up the development server.
-2. We will register a dummy Customer and the Manager.
-3. The Customer will request a dish, simulating the conflict banner and joining a batch.
-4. The Customer will complete checkout and upload a stub image for GPay.
-5. The Manager will view the Dashboard, see the pulse, move the order in the Pipeline context, producing the delivery code.
-6. The Customer's Order Status will instantly show the DD-Code.
+### Manual Verification Workflow
+1. **Local Dev**: Run `npm run dev` in `dds-kitchen`.
+2. **Path Check**: Ensure URLs look like `localhost:3000/App/...`.
+3. **Deployment**: Push to `main`.
+4. **Actions**: Monitor GitHub Actions "Deploy Next.js site to Pages".
+5. **Live Test**: Verify role-based redirection on the live site.
