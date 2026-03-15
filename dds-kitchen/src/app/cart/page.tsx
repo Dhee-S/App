@@ -127,14 +127,14 @@ export default function CartPage() {
 
   const handleUpload = () => {
     // Simulate upload
-    setStep(3)
-    setTimeout(() => {
-      setIsCheckingOut(false)
-      clearCart()
-      showToast('Transaction received. Verification in progress.', 'success')
-      window.location.href = '/orders'
-    }, 2000)
-  }
+      setStep(3)
+      setTimeout(() => {
+        setIsCheckingOut(false)
+        clearCart()
+        showToast('Transaction received. Verification in progress.', 'success')
+        window.location.href = '/App/orders'
+      }, 2000)
+    }
 
   if (items.length === 0 && !isCheckingOut) {
     return (
@@ -144,7 +144,7 @@ export default function CartPage() {
         </div>
         <h1 className="text-2xl font-black text-gray-800">Your bag is empty</h1>
         <p className="text-gray-400 text-sm max-w-[240px]">Seems like you haven't discovered your flavor yet.</p>
-        <Link href="/App/">
+        <Link href="/">
           <MatteButton variant="teal">
             Discover Dishes
           </MatteButton>
