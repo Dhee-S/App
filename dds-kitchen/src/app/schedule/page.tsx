@@ -6,7 +6,7 @@ import { MatteButton } from '@/components/MatteButton'
 import { BentoCard } from '@/components/BentoCard'
 import { format, addDays, isSameDay } from 'date-fns'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar as CalendarIcon, ChefHat, Users, Plus, Check, X, Search, Sparkles, Clock, UtensilsCrossed, ArrowRight, ShoppingBag, Flame, PartyPopper, MessageCircleHeart } from 'lucide-react'
+import { Calendar as CalendarIcon, ChefHat, Plus, Check, X, Search, Sparkles, Clock, UtensilsCrossed, ArrowRight, ShoppingBag, Flame, MessageCircleHeart } from 'lucide-react'
 import Image from 'next/image'
 import { useCart } from '@/store/useCart'
 import { useToast } from '@/components/Toast'
@@ -18,7 +18,6 @@ export default function SchedulePage() {
   
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [kitchenSchedules, setKitchenSchedules] = useState<any[]>([])
-  const [userBatches, setUserBatches] = useState<any[]>([])
   const [availableDishes, setAvailableDishes] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showRequestModal, setShowRequestModal] = useState(false)
@@ -26,7 +25,7 @@ export default function SchedulePage() {
   const [requesting, setRequesting] = useState(false)
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
   const [requestQty, setRequestQty] = useState(1)
-  const [daySummary, setDaySummary] = useState<{ [key: string]: { hasRequest: boolean, hasSchedule: boolean } }>({})
+  const [daySummary, setDaySummary] = useState<{ [key: string]: { hasSchedule: boolean } }>({})
   const [dishSearch, setDishSearch] = useState('')
 
   const filteredDishes = availableDishes.filter(dish => 
@@ -40,28 +39,22 @@ export default function SchedulePage() {
       setLoading(true)
       const dateStr = format(selectedDate, 'yyyy-MM-dd')
       
-      const [schedRes, reqRes, dishRes] = await Promise.all([
+      const [schedRes, dishRes] = await Promise.all([
         supabase.from('schedules').select('*, dishes(*)').eq('scheduled_date', dateStr),
-        supabase.from('requests').select('*, dishes(*)').eq('requested_date', dateStr).eq('status', 'accepted'),
         supabase.from('dishes').select('*').eq('is_available', true)
       ])
 
       setKitchenSchedules(schedRes.data || [])
-      setUserBatches(reqRes.data || [])
       setAvailableDishes(dishRes.data || [])
       setLoading(false)
     }
 
     async function fetchSummary() {
       const { data: scheds } = await supabase.from('schedules').select('scheduled_date')
-      const { data: reqs } = await supabase.from('requests').select('requested_date').eq('status', 'accepted')
       
       const summary: any = {}
       scheds?.forEach(s => {
-        summary[s.scheduled_date] = { ...summary[s.scheduled_date], hasSchedule: true }
-      })
-      reqs?.forEach(r => {
-        summary[r.requested_date] = { ...summary[r.requested_date], hasRequest: true }
+        summary[s.scheduled_date] = { hasSchedule: true }
       })
       setDaySummary(summary)
     }
@@ -117,7 +110,7 @@ export default function SchedulePage() {
     setRequesting(false)
   }
 
-  const hasItems = kitchenSchedules.length > 0 || userBatches.length > 0
+  const hasItems = kitchenSchedules.length > 0
 
   return (
     <div className="w-full flex flex-col p-6 pb-24 space-y-8 mesh-bg min-h-screen">
@@ -136,49 +129,63 @@ export default function SchedulePage() {
       </header>
       
       {/* Date Scroller */}
-      <div className="relative">
-        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x px-2">
-          {dates.map((date) => {
+      <div className="relative -mx-6 px-4">
+        <div className="flex gap-3 overflow-x-auto pb-6 scrollbar-hide snap-x">
+          {dates.map((date, idx) => {
             const isSelected = isSameDay(date, selectedDate)
+            const hasSchedule = daySummary[format(date, 'yyyy-MM-dd')]?.hasSchedule
+            const isToday = isSameDay(date, new Date())
             return (
-              <button
+              <motion.button
                 key={date.toISOString()}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.03 }}
                 onClick={() => setSelectedDate(date)}
-                className={`snap-center flex flex-col items-center justify-center min-w-[72px] h-24 rounded-3xl transition-all duration-500 relative overflow-hidden group ${
+                whileTap={{ scale: 0.95 }}
+                className={`snap-center flex flex-col items-center justify-center min-w-[68px] h-28 rounded-[1.5rem] transition-all duration-300 relative overflow-hidden ${
                   isSelected 
-                    ? 'bg-[#268C7F] text-white shadow-xl shadow-[#268C7F]/20 scale-105' 
-                    : 'bg-white text-gray-400 border border-gray-100 shadow-sm'
+                    ? 'bg-gradient-to-b from-[#268C7F] to-[#1E7469] text-white shadow-2xl shadow-[#268C7F]/30 scale-105' 
+                    : 'bg-white text-gray-500 border border-gray-100 shadow-md hover:shadow-lg'
                 }`}
               >
                 {isSelected && (
                   <motion.div 
                     layoutId="active-date" 
-                    className="absolute inset-0 bg-gradient-to-br from-[#268C7F] to-[#1E7469]" 
+                    className="absolute inset-0" 
                   />
                 )}
-                <span className={`relative text-[10px] font-black uppercase tracking-widest ${isSelected ? 'text-white/70' : 'text-gray-300'}`}>
-                  {format(date, 'EEE')}
+                
+                {/* Day name */}
+                <span className={`relative text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-white/80' : isToday ? 'text-[#268C7F]' : 'text-gray-400'}`}>
+                  {isToday ? 'Today' : format(date, 'EEE')}
                 </span>
-                <span className="relative text-2xl font-black mt-1">
+                
+                {/* Date number */}
+                <span className={`relative text-3xl font-black mt-1 ${isSelected ? 'text-white' : 'text-gray-800'}`}>
                   {format(date, 'd')}
                 </span>
                 
-                {/* Activity Dots */}
-                <div className="relative flex gap-1 mt-2 h-1.5 items-center">
-                   {daySummary[format(date, 'yyyy-MM-dd')]?.hasSchedule && (
-                      <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white' : 'bg-[#E1803A] animate-pulse'}`} />
-                   )}
-                   {daySummary[format(date, 'yyyy-MM-dd')]?.hasRequest && (
-                      <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white/60' : 'bg-[#06B6D4]'}`} />
-                   )}
-                  {!daySummary[format(date, 'yyyy-MM-dd')] && isSelected && (
-                    <div className="w-1 h-1 rounded-full bg-white/20" />
-                  )}
-                </div>
-              </button>
+                {/* Month */}
+                <span className={`relative text-[9px] font-medium uppercase tracking-widest mt-0.5 ${isSelected ? 'text-white/60' : 'text-gray-300'}`}>
+                  {format(date, 'MMM')}
+                </span>
+                
+                {/* Schedule indicator */}
+                {hasSchedule && !isSelected && (
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute top-2 right-2 w-2 h-2 bg-orange-400 rounded-full"
+                  />
+                )}
+              </motion.button>
             )
           })}
         </div>
+        
+        {/* Scroll hint */}
+        <div className="absolute right-0 top-0 bottom-6 w-12 bg-gradient-to-l from-[#f7f8f6] to-transparent pointer-events-none" />
       </div>
 
       <div className="space-y-6">
@@ -209,78 +216,6 @@ export default function SchedulePage() {
               animate={{ opacity: 1, scale: 1 }}
               className="space-y-6"
             >
-              {userBatches.map((batch, idx) => (
-                <motion.div
-                  key={batch.id}
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.15 }}
-                >
-                  <BentoCard className="border-[#06B6D4]/10 bg-gradient-to-br from-[#06B6D4]/5 to-transparent p-0 overflow-hidden relative">
-                    {/* Animated cyan glow */}
-                    <motion.div 
-                      animate={{ 
-                        background: ['radial-gradient(circle at 0% 0%, rgba(6,182,212,0.1) 0%, transparent 50%)', 'radial-gradient(circle at 100% 100%, rgba(6,182,212,0.15) 0%, transparent 50%)']
-                      }}
-                      transition={{ duration: 3, repeat: Infinity, repeatType: "reverse" }}
-                      className="absolute inset-0" 
-                    />
-                    
-                    <div className="p-5 flex items-start gap-4 relative z-10">
-                       <motion.div 
-                         whileHover={{ rotate: 360 }}
-                         transition={{ duration: 0.8 }}
-                         className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#06B6D4] shadow-sm border border-cyan-50"
-                       >
-                          <Users size={24} />
-                       </motion.div>
-                       <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                             <motion.p 
-                               initial={{ opacity: 0, x: -10 }}
-                               animate={{ opacity: 1, x: 0 }}
-                               className="text-[#06B6D4] text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-1"
-                             >
-                               <PartyPopper size={12} className="animate-bounce" />
-                               Community Batch
-                             </motion.p>
-                             <motion.span 
-                               initial={{ scale: 0 }}
-                               animate={{ scale: 1 }}
-                               transition={{ delay: 0.2 }}
-                               className="w-1 h-1 rounded-full bg-cyan-300" 
-                             />
-                          </div>
-                          <p className="text-sm text-gray-700 font-medium leading-relaxed">
-                            Chef is orchestrating <b className="text-gray-900">{batch.dishes?.name}</b> for a private group. Join them?
-                          </p>
-                          <p className="text-[10px] text-[#06B6D4] font-bold mt-2">
-                            Requested: {batch.quantity} servings
-                          </p>
-                       </div>
-                    </div>
-                    <div className="px-5 pb-5 relative z-10">
-                       <motion.button 
-                         whileHover={{ scale: 1.02 }}
-                         whileTap={{ scale: 0.98 }}
-                         onClick={() => {
-                           addItem({
-                             id: batch.dishes.id,
-                             name: batch.dishes.name,
-                             price: Number(batch.dishes.price),
-                             image_url: batch.dishes.image_url
-                           })
-                           showToast(`${batch.dishes.name} added to cart!`, 'success')
-                         }}
-                         className="w-full py-4 bg-gradient-to-r from-[#06B6D4] to-cyan-400 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-cyan-100 flex items-center justify-center gap-2 hover:shadow-xl transition-all"
-                      >
-                          <Users size={14} /> Secure Spot in Batch
-                       </motion.button>
-                    </div>
-                  </BentoCard>
-                </motion.div>
-              ))}
-
               {kitchenSchedules.map((schedule, idx) => (
                 <motion.div
                   key={schedule.id}
@@ -474,7 +409,7 @@ export default function SchedulePage() {
 
               <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-hide">
                  {filteredDishes.map(dish => {
-                    const isAlreadyScheduled = kitchenSchedules.some(s => s.dishes.id === dish.id) || userBatches.some(b => b.dishes.id === dish.id)
+                    const isAlreadyScheduled = kitchenSchedules.some(s => s.dishes.id === dish.id)
                     return (
                       <button 
                         key={dish.id} 
