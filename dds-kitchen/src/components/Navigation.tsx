@@ -10,7 +10,10 @@ export function Navigation() {
   const pathname = usePathname()
   const totalItems = useCart((state) => state.items.reduce((acc, item) => acc + item.quantity, 0))
 
-  if (pathname.startsWith('/admin') || pathname === '/login') return null;
+  const isLoginPage = pathname === '/login' || pathname === '/App/login' || pathname === '/App/login/'
+  const isAdminPage = pathname.startsWith('/admin') || pathname.startsWith('/App/admin')
+
+  if (isAdminPage || isLoginPage) return null;
 
   const navItems = [
     { label: 'Home', icon: Home, href: '/' },
@@ -25,7 +28,9 @@ export function Navigation() {
       <div className="flex justify-around items-center h-16">
         {navItems.map((item) => {
           const Icon = item.icon
-          const isActive = pathname === item.href
+          const cleanPath = pathname.replace(/^\/App/, '') || '/'
+          const isActive = cleanPath === item.href || pathname === item.href
+          
           return (
             <Link
               key={item.href}

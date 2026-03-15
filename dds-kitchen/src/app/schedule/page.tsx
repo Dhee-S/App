@@ -121,8 +121,17 @@ export default function SchedulePage() {
 
   return (
     <div className="w-full flex flex-col p-6 pb-24 space-y-8 mesh-bg min-h-screen">
-      <header className="space-y-1">
-        <h1 className="text-3xl font-black text-gray-800 tracking-tighter">Kitchen Calendar</h1>
+      <header className="space-y-2">
+        <div className="flex items-center gap-2">
+          <motion.div 
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="text-2xl"
+          >
+            🍳
+          </motion.div>
+          <h1 className="text-3xl font-black text-gray-800 tracking-tighter">Kitchen Calendar</h1>
+        </div>
         <p className="text-sm font-subheading italic text-gray-400">Discover planned batches and suggest your own.</p>
       </header>
       
@@ -214,7 +223,7 @@ export default function SchedulePage() {
                         background: ['radial-gradient(circle at 0% 0%, rgba(6,182,212,0.1) 0%, transparent 50%)', 'radial-gradient(circle at 100% 100%, rgba(6,182,212,0.15) 0%, transparent 50%)']
                       }}
                       transition={{ duration: 3, repeat: Infinity, repeatType: "reverse" }}
-                      className="absolute inset-0" 
+                      className="absolute inset-0 pointer-events-none" 
                     />
                     
                     <div className="p-5 flex items-start gap-4 relative z-10">
@@ -243,10 +252,10 @@ export default function SchedulePage() {
                              />
                           </div>
                           <p className="text-sm text-gray-700 font-medium leading-relaxed">
-                            Chef is orchestrating <b className="text-gray-900">{batch.dishes?.name}</b> for a private group. Join them?
+                            Chef is orchestrating <b className="text-gray-900">{batch.dishes?.name || 'Gourmet Batch'}</b> for a private group. Join them?
                           </p>
                           <p className="text-[10px] text-[#06B6D4] font-bold mt-2">
-                            Requested: {batch.quantity} servings
+                            Requested: {batch.quantity || 1} servings
                           </p>
                        </div>
                     </div>
@@ -255,6 +264,10 @@ export default function SchedulePage() {
                          whileHover={{ scale: 1.02 }}
                          whileTap={{ scale: 0.98 }}
                          onClick={() => {
+                           if (!batch.dishes) {
+                             showToast('Dish details missing from protocol.', 'error')
+                             return
+                           }
                            addItem({
                              id: batch.dishes.id,
                              name: batch.dishes.name,
@@ -384,21 +397,36 @@ export default function SchedulePage() {
               ))}
 
               {!hasItems && (
-                <div className="mt-8 text-center border-2 border-dashed border-gray-100 rounded-[3rem] p-16 bg-white/40 relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12 group-hover:rotate-45 transition-transform duration-700">
-                     <ChefHat size={80} />
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-8 text-center border-2 border-dashed border-orange-100 rounded-[3rem] p-12 bg-gradient-to-b from-orange-50/50 to-white relative overflow-hidden"
+                >
+                  <motion.div 
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute top-0 right-0 p-8 opacity-20"
+                  >
+                     <ChefHat size={100} className="text-orange-400" />
+                  </motion.div>
+                  <div className="relative z-10">
+                    <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-amber-100 rounded-[2.5rem] mx-auto mb-6 flex items-center justify-center text-5xl shadow-xl">
+                      🍲
+                    </div>
+                    <h3 className="text-2xl font-black text-gray-800 mb-3">Chef is Listening</h3>
+                    <p className="text-gray-400 text-sm max-w-[280px] mx-auto mb-8 leading-relaxed">
+                      The kitchen has no scheduled batches for this date. Be the pioneer and request your favorite dish!
+                    </p>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="bg-gradient-to-r from-[#E1803A] to-orange-400 text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-orange-200 flex items-center gap-2 mx-auto"
+                      onClick={() => setShowRequestModal(true)}
+                    >
+                      <Plus size={18} /> Request Flavor
+                    </motion.button>
                   </div>
-                  <div className="w-20 h-20 bg-white rounded-[2rem] mx-auto mb-8 flex items-center justify-center text-3xl shadow-xl ring-1 ring-black/[0.05]">
-                    🍲
-                  </div>
-                  <h3 className="text-xl font-black text-gray-800 mb-2">Chef is Listening</h3>
-                  <p className="text-[11px] text-gray-400 mb-10 max-w-[200px] mx-auto font-medium leading-relaxed tracking-wide">
-                    The kitchen has no scheduled batches for this date. Be the pioneer.
-                  </p>
-                  <MatteButton size="lg" variant="orange" className="rounded-2xl px-12 group" onClick={() => setShowRequestModal(true)}>
-                    <Plus size={18} className="mr-2 group-hover:rotate-90 transition-transform" /> Request Flavor
-                  </MatteButton>
-                </div>
+                </motion.div>
               )}
             </motion.div>
           )}

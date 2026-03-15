@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { MatteButton } from '@/components/MatteButton'
 import { BentoCard } from '@/components/BentoCard'
 import { useCart } from '@/store/useCart'
@@ -9,14 +9,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Trash2, Plus, Minus, Camera, ShieldCheck, X, Check, Upload, Loader2, Copy, Phone } from 'lucide-react'
 import { useToast } from '@/components/Toast'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function CartPage() {
   const { items, removeItem, addItem, totalPrice, clearCart } = useCart()
-  const { showToast } = useToast()
+  const { showToast } = useToast() || { showToast: (msg: string) => console.log(msg) }
   const supabase = createClient()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
   const [step, setStep] = useState(1)
-  const [pastedImage, setPastedImage] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [copied, setCopied] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -144,9 +144,11 @@ export default function CartPage() {
         </div>
         <h1 className="text-2xl font-black text-gray-800">Your bag is empty</h1>
         <p className="text-gray-400 text-sm max-w-[240px]">Seems like you haven't discovered your flavor yet.</p>
-        <MatteButton variant="teal" onClick={() => window.location.href = '/App/'}>
-           Discover Dishes
-        </MatteButton>
+        <Link href="/App/">
+          <MatteButton variant="teal">
+            Discover Dishes
+          </MatteButton>
+        </Link>
       </div>
     )
   }

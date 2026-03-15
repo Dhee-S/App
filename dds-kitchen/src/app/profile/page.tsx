@@ -35,11 +35,13 @@ export default function ProfilePage() {
           .single()
         
         if (data) {
-          setProfile(data)
+          setProfile({ ...data, email: user.email })
           setFullName(data.full_name || '')
           setPhone(data.phone || '')
           setAddress(data.address || '')
           setPreference(data.dietary_preference || (data.preference_veg ? 'veg' : 'both'))
+        } else {
+          setProfile({ email: user.email })
         }
       } else {
         router.push('/login')
