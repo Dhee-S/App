@@ -131,7 +131,14 @@ export default function RequestHub({
                           )}
                        </div>
                        <div className="flex-1 min-w-0">
-                          <p className="text-[9px] font-black uppercase tracking-widest text-[#268C7F] mb-1">New Suggestion</p>
+                          <div className="flex justify-between items-start">
+                            <p className="text-[9px] font-black uppercase tracking-widest text-[#268C7F] mb-1">New Suggestion</p>
+                            {req.quantity > 1 && (
+                              <span className="bg-[#268C7F]/5 text-[#268C7F] text-[9px] font-black px-2 py-0.5 rounded-lg border border-[#268C7F]/10">
+                                {req.quantity} UNITS
+                              </span>
+                            )}
+                          </div>
                           <h3 className="text-lg font-black text-gray-800 leading-tight truncate">{req.dishes?.name}</h3>
                           <div className="flex items-center gap-2 mt-2">
                              <div className="w-5 h-5 rounded-full bg-gray-50 flex items-center justify-center text-gray-400"><User size={10} /></div>

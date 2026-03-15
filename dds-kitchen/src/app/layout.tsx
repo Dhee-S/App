@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${plusJakartaSans.variable} ${arima.variable} ${trirong.variable} ${merriweather.variable} font-body bg-background text-foreground antialiased mesh-bg min-h-screen noise-overlay`}>
-        <main className="max-w-md mx-auto min-h-screen relative pb-20 overflow-x-hidden">
+        <main className="max-w-md mx-auto min-h-screen relative pb-8 overflow-x-hidden">
           <Providers>
             {children}
             <Navigation />

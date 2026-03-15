@@ -1,12 +1,12 @@
 'use client'
 
-import { Mail, Phone, MapPin, Instagram, Facebook, ChefHat, Heart } from 'lucide-react'
+import { Mail, Phone, MapPin, MessageSquare, ChefHat, Heart } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { BentoCard } from './BentoCard'
 
 export function Footer() {
   return (
-    <footer className="w-full px-6 pt-12 pb-32 space-y-12 bg-gray-50/50 relative overflow-hidden">
+    <footer className="w-full px-6 pt-12 pb-16 space-y-12 bg-gray-50/50 relative overflow-hidden">
       {/* Decorative Aurora */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
       
@@ -72,12 +72,15 @@ export function Footer() {
         {/* Footer Bottom */}
         <div className="pt-8 flex flex-col items-center gap-6 text-center">
           <div className="flex gap-4">
-            <button className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 hover:text-pink-500 transition-colors">
-              <Instagram size={18} />
-            </button>
-            <button className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors">
-              <Facebook size={18} />
-            </button>
+            <a 
+              href="https://wa.me/919876543210" 
+              target="_blank" 
+              rel="noreferrer"
+              className="px-8 py-3 rounded-2xl bg-white shadow-xl shadow-black/[0.02] border border-gray-100 flex items-center gap-3 text-[#25D366] hover:scale-105 transition-all group"
+            >
+              <MessageSquare size={18} fill="currentColor" className="opacity-20 group-hover:opacity-100 transition-opacity" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-700">Contact via WhatsApp</span>
+            </a>
           </div>
           
           <div className="space-y-1">
