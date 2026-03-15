@@ -33,18 +33,48 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
 
-  // Protect /admin routes
-  // [GRANT FULL ACCESS MODE: Commenting this block out for now]
-  /*
-  if (path.startsWith('/admin') && !user) {
+  // Paths that are always public
+  const isPublicRoute = path.startsWith('/login') || path.startsWith('/auth') || path.startsWith('/_next') || path.includes('.')
+
+  // 1. If not logged in and not on a public route, redirect to /login
+  if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
-  */
 
-  // Optional: Add logic to fetch profile and check if role is MANAGER for /admin paths
-  // If we really want to be strict at the middleware level, but usually we do it in layout.
+  // 2. If logged in, handle role-based redirection
+  if (user) {
+    // Fetch profile to check role
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    const role = profile?.role
+
+    // Redirect away from login if already authenticated
+    if (path === '/login') {
+      const url = request.nextUrl.clone()
+      url.pathname = role === 'MANAGER' ? '/admin/dash' : '/'
+      return NextResponse.redirect(url)
+    }
+
+    // Role-based route protection
+    if (path.startsWith('/admin') && role !== 'MANAGER') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
+
+    // Redirect Manager from root to dashboard
+    if (path === '/' && role === 'MANAGER') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/admin/dash'
+      return NextResponse.redirect(url)
+    }
+  }
 
   return supabaseResponse
 }

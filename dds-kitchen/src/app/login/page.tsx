@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { login, signup, sendMagicLink } from '@/app/actions/auth'
+import { useRouter } from 'next/navigation'
+import { loginClient, signupClient, sendMagicLinkClient, forgotPasswordClient } from '@/utils/supabase/auth-client'
 
 export default function LoginPage() {
-  const [mode, setMode] = useState<'customer' | 'manager'>('customer')
+  const router = useRouter()
+  const [mode, setMode] = useState<'customer' | 'manager' | 'forgot'>('customer')
   const [isLogin, setIsLogin] = useState(true)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
@@ -13,10 +15,24 @@ export default function LoginPage() {
   async function handleCustomerAuth(formData: FormData) {
     setLoading(true)
     setMessage(null)
-    const action = isLogin ? login : signup
+    const action = isLogin ? loginClient : signupClient
     const res = await action(formData)
     if (res?.error) {
       setMessage({ type: 'error', text: res.error })
+    } else {
+      router.push('/')
+    }
+    setLoading(false)
+  }
+
+  async function handleForgotPassword(formData: FormData) {
+    setLoading(true)
+    setMessage(null)
+    const res = await forgotPasswordClient(formData)
+    if (res?.error) {
+      setMessage({ type: 'error', text: res.error })
+    } else if (res?.success) {
+      setMessage({ type: 'success', text: res.success })
     }
     setLoading(false)
   }
@@ -24,7 +40,7 @@ export default function LoginPage() {
   async function handleManagerAuth(formData: FormData) {
     setLoading(true)
     setMessage(null)
-    const res = await sendMagicLink(formData)
+    const res = await sendMagicLinkClient(formData)
     if (res?.error) {
       setMessage({ type: 'error', text: res.error })
     } else if (res?.success) {
@@ -163,13 +179,60 @@ export default function LoginPage() {
                     {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account'}
                   </motion.button>
 
-                  <div className="text-center mt-6">
+                  <div className="flex flex-col gap-3 mt-6">
                     <button
                       type="button"
                       onClick={() => { setIsLogin(!isLogin); setMessage(null); }}
                       className="text-sm font-subheading text-gray-500 hover:text-gray-700 transition-colors underline decoration-gray-300 underline-offset-4"
                     >
                       {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+                    </button>
+                    
+                    {isLogin && (
+                      <button
+                        type="button"
+                        onClick={() => { setMode('forgot'); setMessage(null); }}
+                        className="text-xs font-subheading text-[#268C7F] hover:text-[#1E7469] transition-colors"
+                      >
+                        Forgot password?
+                      </button>
+                    )}
+                  </div>
+                </form>
+              ) : mode === 'forgot' ? (
+                <form action={handleForgotPassword} className="space-y-5">
+                   <div className="text-center mb-6">
+                    <h2 className="font-heading text-2xl text-gray-800 font-bold">
+                      Reset Password
+                    </h2>
+                    <p className="font-body text-xs text-gray-500 mt-1">
+                      Enter your email to receive a reset link.
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-display font-bold text-gray-600 uppercase tracking-wider ml-1">Email</label>
+                    <input
+                      name="email"
+                      type="email"
+                      required
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-3.5 text-gray-800 font-body focus:outline-none focus:border-[#268C7F] focus:ring-1 focus:ring-[#268C7F]/50 transition-all placeholder:text-gray-400"
+                      placeholder="you@example.com"
+                    />
+                  </div>
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    disabled={loading}
+                    className="w-full bg-[#268C7F] hover:bg-[#1E7469] text-white font-display font-bold text-lg py-4 rounded-xl shadow-md mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Sending...' : 'Send Reset Link'}
+                  </motion.button>
+                  <div className="text-center mt-6">
+                    <button
+                      type="button"
+                      onClick={() => { setMode('customer'); setMessage(null); }}
+                      className="text-sm font-subheading text-gray-500 hover:text-gray-700 transition-colors"
+                    >
+                      Back to sign in
                     </button>
                   </div>
                 </form>
@@ -213,9 +276,9 @@ export default function LoginPage() {
                         const formData = new FormData();
                         formData.append('email', 'sdheepak62@gmail.com');
                         formData.append('password', 'ddskitchen123');
-                        const res = await login(formData);
+                        const res = await loginClient(formData);
                         if (res?.error) setMessage({ type: 'error', text: res.error });
-                        else window.location.href = '/admin/dash';
+                        else router.push('/admin/dash');
                         setLoading(false);
                       }}
                       className="w-full bg-amber-100 hover:bg-amber-200 text-amber-700 font-display font-bold text-sm py-3 rounded-xl border border-amber-200 mt-4 transition-colors"
