@@ -155,7 +155,7 @@ export default function OrderPipeline() {
                            <div className="flex justify-between items-end">
                               <div>
                                  <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest">Quantum Total</p>
-                                 <p className="text-lg font-black text-gray-800 tracking-tighter tabular-nums">${order.total_amount}</p>
+                                 <p className="text-lg font-black text-gray-800 tracking-tighter tabular-nums">{'₹' + order.total_amount}</p>
                               </div>
                               {order.delivery_code && (
                                 <div className="bg-[#268C7F] text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-[#268C7F]/20">

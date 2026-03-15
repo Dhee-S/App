@@ -58,6 +58,12 @@ export default function OrdersPage() {
           <div className="text-center py-16 bg-white rounded-[2rem] border-2 border-dashed border-gray-100">
              <div className="text-4xl mb-4 grayscale opacity-30">🥡</div>
              <p className="text-gray-400 font-medium">No live batches currently.</p>
+             <button 
+               onClick={() => window.location.href = '/App/'}
+               className="mt-4 text-[#268C7F] text-sm font-bold hover:underline"
+             >
+               Discover Menu
+             </button>
           </div>
         ) : (
           activeOrders.map(order => {
@@ -67,13 +73,13 @@ export default function OrdersPage() {
                 <div className="p-6 bg-gradient-to-br from-white to-gray-50 flex justify-between items-center border-b border-gray-100">
                    <div>
                       <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-1">Settlement Total</p>
-                      <p className="text-2xl font-black text-[#268C7F] tracking-tighter">
-                        ${order.total_amount}
-                      </p>
+                       <p className="text-2xl font-black text-[#268C7F] tracking-tighter">
+                         {'₹' + order.total_amount}
+                       </p>
                    </div>
                    <div className="text-right">
                       <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-1">Passcode</p>
-                      <div className={`px-4 py-2 rounded-xl transition-all duration-700 ${order.delivery_code ? 'bg-[#268C7F] text-white shadow-lg shadow-[#268C7F]/20' : 'bg-gray-100 text-gray-300'}`}>
+                       <div className={`px-4 py-2 rounded-xl transition-all duration-700 ${order.delivery_code ? 'bg-[#268C7F] text-white shadow-lg shadow-[#268C7F]/20' : 'bg-gray-100 text-gray-300'}`}>
                          <span className="font-mono font-black tracking-widest text-sm">
                             {order.delivery_code || 'PENDING'}
                          </span>
@@ -147,7 +153,7 @@ export default function OrdersPage() {
                    </p>
                 </div>
                 <div className="text-right">
-                   <p className="text-lg font-black text-gray-800 tracking-tighter">${order.total_amount}</p>
+                   <p className="text-lg font-black text-gray-800 tracking-tighter">{'₹' + order.total_amount}</p>
                 </div>
               </BentoCard>
             ))}

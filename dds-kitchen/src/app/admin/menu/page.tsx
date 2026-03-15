@@ -238,7 +238,7 @@ export default function MenuManagerPage() {
                           <h3 className="font-bold text-gray-800 truncate">{dish.name}</h3>
                           <p className="text-[10px] font-black text-[#268C7F] uppercase tracking-widest mt-0.5">{dish.category}</p>
                        </div>
-                       <p className="text-sm font-black text-gray-800">${dish.price}</p>
+                       <p className="text-sm font-black text-gray-800">{'₹' + dish.price}</p>
                     </div>
                     <p className="text-[11px] text-gray-400 mt-2 line-clamp-2 leading-relaxed">{dish.description}</p>
                     

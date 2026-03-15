@@ -124,3 +124,38 @@ Develop reusable components based on the Stitch designs using the extracted desi
 3. **Deployment**: Push to `main`.
 4. **Actions**: Monitor GitHub Actions "Deploy Next.js site to Pages".
 5. **Live Test**: Verify role-based redirection on the live site.
+
+## Recent Fixes & Changes
+
+### Bug Fixes Completed
+1. **Fixed Template Literals**: Changed all broken `₹{variable}` patterns to proper JSX expressions using `{'₹' + variable}` format across all pages:
+   - `src/app/orders/page.tsx`
+   - `src/app/cart/page.tsx`
+   - `src/app/schedule/page.tsx`
+   - `src/app/admin/pipeline/page.tsx`
+   - `src/app/admin/menu/page.tsx`
+   - `src/components/ParallaxHeader.tsx`
+   - `src/app/page.tsx`
+
+2. **Fixed WhatsApp Link**: Updated phone number from `919876543210` to `917904935160` in schedule page
+
+3. **Fixed Cart Payment Flow**: 
+   - Added real Supabase integration for order creation
+   - Added file upload handling for payment screenshots
+   - Creates order in `orders` table with payment screenshot URL
+   - Creates order items in `order_items` table
+   - Added loading state during upload
+   - Properly redirects to orders page after success
+
+4. **Updated Footer**:
+   - New phone: 7904935160
+   - New address: Whitefield Grand, Chitlapakkam, Chennai
+   - Updated description
+   - WhatsApp-only contact option
+
+5. **Fixed Schedule Pages & Workflow**:
+   - User schedule: "Secure Spot in Batch" button now adds dish to cart
+   - User schedule: Added search functionality to request modal
+   - User schedule: Shows quantity requested for community batches
+   - Admin requests: Creates schedule automatically when accepting a request
+   - Admin requests: Proper workflow from request → accepted → schedule created

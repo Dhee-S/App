@@ -183,7 +183,7 @@ export default function DiscoveryHome() {
                     </div>
 
                     <div className="flex items-center justify-between mt-auto">
-                      <p className="text-[#268C7F] font-black text-lg tracking-tighter tabular-nums">${dish.price}</p>
+                      <p className="text-[#268C7F] font-black text-lg tracking-tighter tabular-nums">{'₹' + dish.price}</p>
                       
                       <motion.button
                         whileTap={{ scale: 0.8 }}

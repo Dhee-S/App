@@ -1,92 +1,117 @@
 'use client'
 
-import { Mail, Phone, MapPin, MessageSquare, ChefHat, Heart } from 'lucide-react'
+import { Phone, MapPin, MessageSquare, ChefHat, Heart, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { BentoCard } from './BentoCard'
 
 export function Footer() {
   return (
-    <footer className="w-full px-6 pt-12 pb-16 space-y-12 bg-gray-50/50 relative overflow-hidden">
-      {/* Decorative Aurora */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+    <footer className="w-full px-4 pt-10 pb-20 space-y-10 bg-gradient-to-b from-gray-50/30 to-gray-100/50 relative overflow-hidden">
+      {/* Decorative Top Border */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#268C7F]/30 to-transparent" />
       
-      <div className="space-y-8">
+      <div className="max-w-md mx-auto space-y-10">
         {/* Chef Profile Section */}
-        <section className="space-y-6">
+        <section className="space-y-4">
           <div className="flex items-center gap-2 px-1">
-            <ChefHat size={14} className="text-[#268C7F]" />
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">The Soul of the Kitchen</h2>
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+            >
+              <ChefHat size={14} className="text-[#268C7F]" />
+            </motion.div>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">The Soul of the Kitchen</h2>
           </div>
           
-          <BentoCard className="p-6 border-none shadow-xl shadow-black/[0.02] bg-white ring-1 ring-black/[0.01]">
-            <div className="flex flex-col gap-6">
+          <BentoCard className="p-5 border-none shadow-lg shadow-black/[0.03] bg-white/80 backdrop-blur-sm ring-1 ring-black/[0.02]">
+            <div className="flex flex-col gap-4">
               <div className="flex gap-4 items-center">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#268C7F]/10 to-[#E1803A]/10 flex items-center justify-center text-2xl shadow-inner">
+                <motion.div 
+                  whileHover={{ scale: 1.05, rotate: 5 }}
+                  className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#268C7F]/20 to-[#E1803A]/20 flex items-center justify-center text-2xl shadow-inner"
+                >
                   👩‍🍳
-                </div>
-                <div>
-                  <h3 className="text-xl font-black text-gray-800 tracking-tighter shiny-text">Ponnukodi S</h3>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#268C7F] opacity-60">Executive Chef & Owner</p>
+                </motion.div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-black text-gray-800 tracking-tight">Ponnukodi S</h3>
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-[#268C7F] opacity-70">Executive Chef & Owner</p>
                 </div>
               </div>
               
-              <p className="text-xs text-gray-500 leading-relaxed font-subheading italic">
-                "Cooking is my language of love. Every dish at DD's Kitchen is a recipe passed down through generations, refined with modern gourmet techniques and a whole lot of heart."
+              <p className="text-xs text-gray-500 leading-relaxed font-subheading italic border-l-2 border-[#268C7F]/20 pl-3">
+                "Crafted with heart, refined by hand. Today's special is more than a meal—it's a piece of our family table, prepared with the same care I'd give my own kin. Slow-cooked, small-batch, and purely for the joy of sharing."
               </p>
             </div>
           </BentoCard>
         </section>
 
         {/* Contact Protocol */}
-        <section className="space-y-6">
+        <section className="space-y-4">
           <div className="flex items-center gap-2 px-1">
             <Phone size={14} className="text-[#E1803A]" />
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Contact Protocol</h2>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">Contact Protocol</h2>
           </div>
           
-          <div className="grid grid-cols-1 gap-3">
-            <a href="tel:+919876543210" className="group">
-              <BentoCard className="p-4 flex items-center gap-4 hover:bg-white transition-all border-none shadow-sm ring-1 ring-black/[0.01]">
-                <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-[#E1803A] group-hover:text-white transition-colors">
-                  <Phone size={18} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-gray-300">Voice Line</p>
-                  <p className="text-sm font-bold text-gray-700">+91 98765 43210</p>
-                </div>
-              </BentoCard>
-            </a>
+          <div className="grid grid-cols-1 gap-2.5">
+            <motion.div whileHover={{ scale: 1.01 }}>
+              <a href="tel:+917904935160" className="block">
+                <BentoCard className="p-4 flex items-center gap-3 hover:bg-white transition-all border-none shadow-md ring-1 ring-black/[0.02] group">
+                  <div className="w-9 h-9 rounded-xl bg-[#E1803A]/10 flex items-center justify-center text-[#E1803A] group-hover:bg-[#E1803A] group-hover:text-white transition-colors">
+                    <Phone size={16} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[8px] font-black uppercase tracking-widest text-gray-400">Contact Kitchen</p>
+                    <p className="text-sm font-bold text-gray-700">+91 79049 35160</p>
+                  </div>
+                  <ArrowRight size={14} className="text-gray-300 group-hover:text-[#E1803A] transition-colors" />
+                </BentoCard>
+              </a>
+            </motion.div>
 
-            <BentoCard className="p-4 flex items-center gap-4 border-none shadow-sm ring-1 ring-black/[0.01]">
-              <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
-                <MapPin size={18} />
-              </div>
-              <div className="flex-1">
-                <p className="text-[9px] font-black uppercase tracking-widest text-gray-300">HQ Location</p>
-                <p className="text-sm font-bold text-gray-700">Gourmet Street, Chennai</p>
-              </div>
-            </BentoCard>
+            <motion.div whileHover={{ scale: 1.01 }}>
+              <a 
+                href="https://maps.google.com/?q=whitefield+grand+chitlapakkam+chennai" 
+                target="_blank" 
+                rel="noreferrer"
+                className="block"
+              >
+                <BentoCard className="p-4 flex items-center gap-3 hover:bg-white transition-all border-none shadow-md ring-1 ring-black/[0.02] group">
+                  <div className="w-9 h-9 rounded-xl bg-[#268C7F]/10 flex items-center justify-center text-[#268C7F] group-hover:bg-[#268C7F] group-hover:text-white transition-colors">
+                    <MapPin size={16} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[8px] font-black uppercase tracking-widest text-gray-400">Location</p>
+                    <p className="text-sm font-bold text-gray-700">Whitefield Grand, Chitlapakkam, Chennai</p>
+                  </div>
+                  <ArrowRight size={14} className="text-gray-300 group-hover:text-[#268C7F] transition-colors" />
+                </BentoCard>
+              </a>
+            </motion.div>
           </div>
         </section>
 
-        {/* Footer Bottom */}
-        <div className="pt-8 flex flex-col items-center gap-6 text-center">
-          <div className="flex gap-4">
-            <a 
-              href="https://wa.me/919876543210" 
-              target="_blank" 
+        {/* Social Links */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-center gap-3">
+            <motion.a
+              whileHover={{ scale: 1.1, y: -2 }}
+              href="https://wa.me/917904935160"
+              target="_blank"
               rel="noreferrer"
-              className="px-8 py-3 rounded-2xl bg-white shadow-xl shadow-black/[0.02] border border-gray-100 flex items-center gap-3 text-[#25D366] hover:scale-105 transition-all group"
+              className="w-12 h-12 rounded-full bg-[#25D366] shadow-lg flex items-center justify-center text-white"
             >
-              <MessageSquare size={18} fill="currentColor" className="opacity-20 group-hover:opacity-100 transition-opacity" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-gray-700">Contact via WhatsApp</span>
-            </a>
+              <MessageSquare size={20} fill="currentColor" />
+            </motion.a>
           </div>
-          
-          <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300">DD's Kitchen © 2026</p>
-            <p className="text-[9px] font-bold text-gray-400 flex items-center justify-center gap-1">
-              Handcrafted with <Heart size={10} className="text-red-400 fill-red-400" /> for Gourmet Lovers
+          <p className="text-center text-[10px] font-medium text-gray-400">Click to chat with the kitchen</p>
+        </section>
+
+        {/* Footer Bottom */}
+        <div className="pt-6 border-t border-gray-200/50">
+          <div className="text-center space-y-3">
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-500">DD's Kitchen © 2026</p>
+            <p className="text-[9px] font-medium text-gray-400 flex items-center justify-center gap-1">
+              Handcrafted with <Heart size={10} className="text-red-400 fill-red-400 animate-pulse" /> for Gourmet Lovers
             </p>
           </div>
         </div>

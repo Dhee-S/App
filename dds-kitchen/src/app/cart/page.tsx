@@ -1,20 +1,34 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { MatteButton } from '@/components/MatteButton'
 import { BentoCard } from '@/components/BentoCard'
 import { useCart } from '@/store/useCart'
+import { createClient } from '@/utils/supabase/client'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Trash2, Plus, Minus, Camera, ShieldCheck, X, Check } from 'lucide-react'
+import { Trash2, Plus, Minus, Camera, ShieldCheck, X, Check, Upload, Loader2, Copy, Phone } from 'lucide-react'
 import { useToast } from '@/components/Toast'
 import Image from 'next/image'
 
 export default function CartPage() {
   const { items, removeItem, addItem, totalPrice, clearCart } = useCart()
   const { showToast } = useToast()
+  const supabase = createClient()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
-  const [step, setStep] = useState(1) // 1: QR, 2: Upload, 3: Success
+  const [step, setStep] = useState(1)
   const [pastedImage, setPastedImage] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const GP_NUMBER = '7904935160'
+
+  const handleCopyNumber = async () => {
+    await navigator.clipboard.writeText(GP_NUMBER)
+    setCopied(true)
+    showToast('Phone number copied!', 'success')
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const subtotal = totalPrice()
   const fees = items.length > 0 ? 5.00 : 0
@@ -23,6 +37,92 @@ export default function CartPage() {
   const handleCheckout = () => {
     setIsCheckingOut(true)
     setStep(1)
+  }
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    
+    setUploading(true)
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        showToast('Please login to place order', 'error')
+        setUploading(false)
+        window.location.href = '/App/login'
+        return
+      }
+
+      let screenshotUrl = null
+      
+      try {
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`
+        const filePath = `payments/${fileName}`
+        
+        const { error: uploadError } = await supabase.storage
+          .from('dds-kitchen')
+          .upload(filePath, file)
+
+        if (!uploadError) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('dds-kitchen')
+            .getPublicUrl(filePath)
+          screenshotUrl = publicUrl
+        }
+      } catch (storageErr) {
+        console.log('Storage upload skipped:', storageErr)
+      }
+
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          total_amount: total,
+          status: 'pending',
+          payment_screenshot_url: screenshotUrl
+        })
+        .select()
+        .single()
+
+      if (orderError) {
+        console.error('Order error:', orderError)
+        showToast('Failed to create order: ' + orderError.message, 'error')
+        setUploading(false)
+        return
+      }
+
+      for (const item of items) {
+        const { error: itemError } = await supabase.from('order_items').insert({
+          order_id: order.id,
+          dish_id: item.id,
+          quantity: item.quantity,
+          unit_price: item.price
+        })
+        if (itemError) {
+          console.error('Item error:', itemError)
+        }
+      }
+
+      setStep(3)
+      setTimeout(() => {
+        setIsCheckingOut(false)
+        clearCart()
+        showToast('Order placed! Verification in progress.', 'success')
+        window.location.href = '/App/orders'
+      }, 2000)
+
+    } catch (error: any) {
+      console.error('Error:', error)
+      showToast('An error occurred: ' + (error?.message || 'Unknown'), 'error')
+    }
+    
+    setUploading(false)
+  }
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
   }
 
   const handleUpload = () => {
@@ -44,7 +144,7 @@ export default function CartPage() {
         </div>
         <h1 className="text-2xl font-black text-gray-800">Your bag is empty</h1>
         <p className="text-gray-400 text-sm max-w-[240px]">Seems like you haven't discovered your flavor yet.</p>
-        <MatteButton variant="teal" onClick={() => window.location.href = '/'}>
+        <MatteButton variant="teal" onClick={() => window.location.href = '/App/'}>
            Discover Dishes
         </MatteButton>
       </div>
@@ -76,7 +176,7 @@ export default function CartPage() {
                 
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-gray-800 truncate">{item.name}</h3>
-                  <p className="text-sm font-black text-[#268C7F] mt-1">${item.price}</p>
+                  <p className="text-sm font-black text-[#268C7F] mt-1">{'₹' + item.price}</p>
                 </div>
 
                 <div className="flex flex-col items-end gap-2">
@@ -106,20 +206,20 @@ export default function CartPage() {
         <div className="border-t border-gray-100 pt-6 space-y-3">
           <div className="flex justify-between text-sm text-gray-500 font-medium">
               <span>Subtotal</span>
-              <span className="text-gray-800">${subtotal.toFixed(2)}</span>
+              <span className="text-gray-800">{'₹' + subtotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm text-gray-500 font-medium">
               <span>Kitchen Fees</span>
-              <span className="text-gray-800">$5.00</span>
+              <span className="text-gray-800">₹5.00</span>
           </div>
           <div className="flex justify-between items-center pt-2">
               <span className="text-lg font-black text-gray-800">Total</span>
-              <span className="text-2xl font-black text-[#268C7F] tracking-tighter">${total.toFixed(2)}</span>
+              <span className="text-2xl font-black text-[#268C7F] tracking-tighter">{'₹' + total.toFixed(2)}</span>
           </div>
         </div>
 
         <MatteButton size="lg" variant="orange" className="w-full text-xl py-6 rounded-3xl" onClick={handleCheckout}>
-           Place Order • ${total.toFixed(2)}
+           Place Order • {'₹' + total.toFixed(2)}
         </MatteButton>
       </div>
 
@@ -149,9 +249,32 @@ export default function CartPage() {
                   <div className="text-center space-y-6">
                     <div>
                       <h2 className="text-2xl font-black text-gray-800 tracking-tighter">Settlement</h2>
-                      <p className="text-sm text-gray-400 font-medium mt-1">Scan Chef's Private GPay</p>
+                      <p className="text-sm text-gray-400 font-medium mt-1">Pay via GPay</p>
                     </div>
                     
+                    <button
+                      onClick={handleCopyNumber}
+                      className="bg-gray-50 rounded-2xl p-4 flex items-center justify-between group hover:bg-[#268C7F]/5 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#268C7F] rounded-xl flex items-center justify-center">
+                          <Phone size={18} className="text-white" />
+                        </div>
+                        <div className="text-left">
+                          <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Phone</p>
+                          <p className="text-lg font-black text-gray-800">+91 {GP_NUMBER}</p>
+                        </div>
+                      </div>
+                      <motion.div
+                        whileTap={{ scale: 0.9 }}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                          copied ? 'bg-green-500 text-white' : 'bg-white text-gray-400 group-hover:text-[#268C7F]'
+                        }`}
+                      >
+                        {copied ? <Check size={18} /> : <Copy size={18} />}
+                      </motion.div>
+                    </button>
+
                     <div className="w-48 h-48 bg-gray-50 rounded-3xl mx-auto border-4 border-dashed border-gray-100 p-6 relative group overflow-hidden">
                        <div className="w-full h-full bg-white rounded-2xl shadow-inner flex items-center justify-center relative overflow-hidden">
                           <div className="absolute inset-0 bg-gradient-to-br from-[#268C7F]/10 to-transparent" />
@@ -168,7 +291,7 @@ export default function CartPage() {
                     </div>
 
                     <MatteButton size="md" variant="teal" className="w-full" onClick={() => setStep(2)}>
-                       I've Paid ${total.toFixed(2)}
+                       I've Paid {'₹' + total.toFixed(2)}
                     </MatteButton>
                   </div>
                 )}
@@ -180,15 +303,31 @@ export default function CartPage() {
                         <p className="text-sm text-gray-400 font-medium mt-1">Upload your payment capture</p>
                       </div>
 
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
+
                       <div 
-                        onClick={handleUpload}
+                        onClick={handleUploadClick}
                         className="border-2 border-dashed border-[#E1803A]/30 rounded-[2rem] p-10 text-center bg-[#E1803A]/5 hover:bg-[#E1803A]/10 transition-all cursor-pointer group"
                       >
-                         <div className="w-16 h-16 bg-white rounded-2xl mx-auto shadow-md flex items-center justify-center text-[#E1803A] mb-4 group-hover:scale-110 transition-transform">
-                            <Camera size={28} />
-                         </div>
-                         <span className="text-sm font-black text-gray-700">Drop Proof Here</span>
-                         <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-widest font-bold">Screenshot / Photo</p>
+                         {uploading ? (
+                           <div className="w-16 h-16 bg-white rounded-2xl mx-auto shadow-md flex items-center justify-center text-[#E1803A] mb-4">
+                             <Loader2 size={28} className="animate-spin" />
+                           </div>
+                         ) : (
+                           <>
+                             <div className="w-16 h-16 bg-white rounded-2xl mx-auto shadow-md flex items-center justify-center text-[#E1803A] mb-4 group-hover:scale-110 transition-transform">
+                                <Camera size={28} />
+                             </div>
+                             <span className="text-sm font-black text-gray-700">Tap to Upload Proof</span>
+                             <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-widest font-bold">Screenshot / Photo</p>
+                           </>
+                         )}
                       </div>
 
                       <p className="text-[10px] text-gray-400 italic">

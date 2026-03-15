@@ -6,7 +6,7 @@ import { MatteButton } from '@/components/MatteButton'
 import { BentoCard } from '@/components/BentoCard'
 import { format, addDays, isSameDay } from 'date-fns'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar as CalendarIcon, ChefHat, Users, Plus, Check, X, Search, Sparkles } from 'lucide-react'
+import { Calendar as CalendarIcon, ChefHat, Users, Plus, Check, X, Search, Sparkles, Clock, UtensilsCrossed, ArrowRight, ShoppingBag, Flame, PartyPopper, MessageCircleHeart } from 'lucide-react'
 import Image from 'next/image'
 import { useCart } from '@/store/useCart'
 import { useToast } from '@/components/Toast'
@@ -27,6 +27,11 @@ export default function SchedulePage() {
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
   const [requestQty, setRequestQty] = useState(1)
   const [daySummary, setDaySummary] = useState<{ [key: string]: { hasRequest: boolean, hasSchedule: boolean } }>({})
+  const [dishSearch, setDishSearch] = useState('')
+
+  const filteredDishes = availableDishes.filter(dish => 
+    dish.name.toLowerCase().includes(dishSearch.toLowerCase())
+  )
 
   const dates = Array.from({ length: 14 }).map((_, i) => addDays(new Date(), i))
 
@@ -151,12 +156,12 @@ export default function SchedulePage() {
                 
                 {/* Activity Dots */}
                 <div className="relative flex gap-1 mt-2 h-1.5 items-center">
-                  {daySummary[format(date, 'yyyy-MM-dd')]?.hasSchedule && (
-                     <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white' : 'bg-[#E1803A] animate-pulse'}`} />
-                  )}
-                  {daySummary[format(date, 'yyyy-MM-dd')]?.hasRequest && (
-                     <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white/60' : 'bg-[#06B6D4]'}`} />
-                  )}
+                   {daySummary[format(date, 'yyyy-MM-dd')]?.hasSchedule && (
+                      <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white' : 'bg-[#E1803A] animate-pulse'}`} />
+                   )}
+                   {daySummary[format(date, 'yyyy-MM-dd')]?.hasRequest && (
+                      <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white/60' : 'bg-[#06B6D4]'}`} />
+                   )}
                   {!daySummary[format(date, 'yyyy-MM-dd')] && isSelected && (
                     <div className="w-1 h-1 rounded-full bg-white/20" />
                   )}
@@ -195,86 +200,187 @@ export default function SchedulePage() {
               animate={{ opacity: 1, scale: 1 }}
               className="space-y-6"
             >
-              {userBatches.map(batch => (
-                <BentoCard key={batch.id} className="border-[#06B6D4]/10 bg-gradient-to-br from-[#06B6D4]/5 to-transparent p-0 overflow-hidden">
-                  <div className="p-5 flex items-start gap-4">
-                     <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#06B6D4] shadow-sm border border-cyan-50">
-                        <Users size={24} />
-                     </div>
-                     <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                           <p className="text-[#06B6D4] text-[10px] font-black uppercase tracking-[0.2em]">Community Batch</p>
-                           <span className="w-1 h-1 rounded-full bg-cyan-200" />
-                        </div>
-                        <p className="text-sm text-gray-700 font-medium leading-relaxed">Chef is orchestrating <b>{batch.dishes?.name}</b> for a private group. Join them?</p>
-                     </div>
-                  </div>
-                  <div className="px-5 pb-5">
-                     <MatteButton size="sm" variant="cyan" className="w-full font-black text-[10px] tracking-widest uppercase py-4 rounded-xl shadow-lg shadow-cyan-100">
-                        Secure Spot in Batch
-                     </MatteButton>
-                  </div>
-                </BentoCard>
+              {userBatches.map((batch, idx) => (
+                <motion.div
+                  key={batch.id}
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.15 }}
+                >
+                  <BentoCard className="border-[#06B6D4]/10 bg-gradient-to-br from-[#06B6D4]/5 to-transparent p-0 overflow-hidden relative">
+                    {/* Animated cyan glow */}
+                    <motion.div 
+                      animate={{ 
+                        background: ['radial-gradient(circle at 0% 0%, rgba(6,182,212,0.1) 0%, transparent 50%)', 'radial-gradient(circle at 100% 100%, rgba(6,182,212,0.15) 0%, transparent 50%)']
+                      }}
+                      transition={{ duration: 3, repeat: Infinity, repeatType: "reverse" }}
+                      className="absolute inset-0" 
+                    />
+                    
+                    <div className="p-5 flex items-start gap-4 relative z-10">
+                       <motion.div 
+                         whileHover={{ rotate: 360 }}
+                         transition={{ duration: 0.8 }}
+                         className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#06B6D4] shadow-sm border border-cyan-50"
+                       >
+                          <Users size={24} />
+                       </motion.div>
+                       <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                             <motion.p 
+                               initial={{ opacity: 0, x: -10 }}
+                               animate={{ opacity: 1, x: 0 }}
+                               className="text-[#06B6D4] text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-1"
+                             >
+                               <PartyPopper size={12} className="animate-bounce" />
+                               Community Batch
+                             </motion.p>
+                             <motion.span 
+                               initial={{ scale: 0 }}
+                               animate={{ scale: 1 }}
+                               transition={{ delay: 0.2 }}
+                               className="w-1 h-1 rounded-full bg-cyan-300" 
+                             />
+                          </div>
+                          <p className="text-sm text-gray-700 font-medium leading-relaxed">
+                            Chef is orchestrating <b className="text-gray-900">{batch.dishes?.name}</b> for a private group. Join them?
+                          </p>
+                          <p className="text-[10px] text-[#06B6D4] font-bold mt-2">
+                            Requested: {batch.quantity} servings
+                          </p>
+                       </div>
+                    </div>
+                    <div className="px-5 pb-5 relative z-10">
+                       <motion.button 
+                         whileHover={{ scale: 1.02 }}
+                         whileTap={{ scale: 0.98 }}
+                         onClick={() => {
+                           addItem({
+                             id: batch.dishes.id,
+                             name: batch.dishes.name,
+                             price: Number(batch.dishes.price),
+                             image_url: batch.dishes.image_url
+                           })
+                           showToast(`${batch.dishes.name} added to cart!`, 'success')
+                         }}
+                         className="w-full py-4 bg-gradient-to-r from-[#06B6D4] to-cyan-400 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-cyan-100 flex items-center justify-center gap-2 hover:shadow-xl transition-all"
+                      >
+                          <Users size={14} /> Secure Spot in Batch
+                       </motion.button>
+                    </div>
+                  </BentoCard>
+                </motion.div>
               ))}
 
-              {kitchenSchedules.map(schedule => (
-                <BentoCard key={schedule.id} className="group p-0 border-gray-100 shadow-xl shadow-black/[0.02] overflow-hidden">
-                  <div className="relative h-56 w-full">
-                     {schedule.dishes?.image_url ? (
-                        <Image src={schedule.dishes.image_url} alt={schedule.dishes.name} fill className="object-cover group-hover:scale-110 transition-transform duration-1000" />
-                     ) : (
-                        <div className="w-full h-full bg-gray-50 flex items-center justify-center text-gray-300 italic">No Glimpse</div>
-                     )}
-                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                     <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-white">
-                        <div className="max-w-[70%]">
-                           <div className="flex items-center gap-2 mb-2">
-                              <span className="bg-[#E1803A] text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider shadow-lg">Kitchen Slot</span>
-                              <div className="flex gap-1">
-                                 {[1,2,3].map(i => <div key={i} className="w-1 h-1 rounded-full bg-white/40" />)}
-                              </div>
-                           </div>
-                           <h3 className="text-2xl font-black tracking-tighter leading-none">{schedule.dishes?.name}</h3>
-                        </div>
-                        <div className="text-right">
-                           <p className="text-[10px] font-black uppercase text-white/50 tracking-widest mb-1">Price</p>
-                           <p className="text-2xl font-black tracking-tighter tabular-nums">${schedule.dishes?.price}</p>
-                        </div>
-                     </div>
-                  </div>
-                   <div className="p-5 flex items-center justify-between bg-white border-t border-gray-50">
-                     <div className="flex items-center gap-3">
-                        <div className="relative">
-                           <div className={`w-3 h-3 rounded-full ${schedule.servings_remaining > 0 ? 'bg-green-500' : 'bg-red-400'}`} />
-                           {schedule.servings_remaining > 0 && <div className="absolute inset-0 w-3 h-3 rounded-full bg-green-500 animate-ping opacity-30" />}
-                        </div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                          {schedule.servings_remaining > 0 ? `${schedule.servings_remaining} Servings Remaining` : 'Booked Full'}
-                        </p>
-                     </div>
-                     {schedule.servings_remaining > 0 ? (
-                       <MatteButton 
-                        size="sm" 
-                        variant="teal" 
-                        className="px-8 rounded-xl"
-                        onClick={() => handleInstantBuy(schedule)}
-                       >
-                          {addedIds.has(schedule.id) ? (
-                            <span className="flex items-center gap-2">
-                               <Check size={14} className="animate-in zoom-in" /> Confirmed
-                            </span>
-                          ) : 'Instant Buy'}
-                       </MatteButton>
-                     ) : (
-                       <button 
-                        onClick={() => window.location.href = `https://wa.me/919876543210?text=I'd like to book ${schedule.dishes?.name} for ${schedule.scheduled_date}`}
-                        className="text-[10px] font-black text-[#268C7F] uppercase tracking-widest border border-[#268C7F]/20 px-4 py-2 rounded-xl hover:bg-[#268C7F]/5 transition-colors"
-                       >
-                         Contact Kitchen
-                       </button>
-                     )}
-                  </div>
-                </BentoCard>
+              {kitchenSchedules.map((schedule, idx) => (
+                <motion.div
+                  key={schedule.id}
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: idx * 0.1, type: "spring", stiffness: 300, damping: 25 }}
+                >
+                  <BentoCard className="group p-0 border-gray-100 shadow-xl shadow-black/[0.02] overflow-hidden relative">
+                    {/* Animated kitchen badge */}
+                    <motion.div 
+                      initial={{ x: -100, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 + idx * 0.1 }}
+                      className="absolute top-4 left-4 z-10 flex items-center gap-2"
+                    >
+                      <span className="bg-[#E1803A] text-white text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1">
+                        <Flame size={12} className="animate-pulse" />
+                        Kitchen Slot
+                      </span>
+                    </motion.div>
+
+                    <div className="relative h-56 w-full">
+                      {schedule.dishes?.image_url ? (
+                         <Image src={schedule.dishes.image_url} alt={schedule.dishes.name} fill className="object-cover group-hover:scale-110 transition-transform duration-1000" />
+                      ) : (
+                         <div className="w-full h-full bg-gray-50 flex items-center justify-center text-gray-300 italic">No Glimpse</div>
+                      )}
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 + idx * 0.1 }}
+                        className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" 
+                      />
+                      <motion.div 
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 + idx * 0.1 }}
+                        className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-white"
+                      >
+                         <div className="max-w-[70%]">
+                            <div className="flex items-center gap-2 mb-2">
+                               <div className="flex gap-1">
+                                  {[1,2,3].map(i => (
+                                    <motion.div 
+                                      key={i}
+                                      animate={{ scale: [1, 1.2, 1] }}
+                                      transition={{ delay: 0.5 + i * 0.1, duration: 0.8, repeat: Infinity }}
+                                      className="w-1 h-1 rounded-full bg-white/60" 
+                                    />
+                                  ))}
+                               </div>
+                            </div>
+                            <h3 className="text-2xl font-black tracking-tighter leading-none">{schedule.dishes?.name}</h3>
+                         </div>
+                         <div className="text-right">
+                            <p className="text-[10px] font-black uppercase text-white/50 tracking-widest mb-1">Price</p>
+                            <p className="text-2xl font-black tracking-tighter tabular-nums">{'₹' + schedule.dishes?.price}</p>
+                         </div>
+                      </motion.div>
+                    </div>
+                    <div className="p-5 flex items-center justify-between bg-white border-t border-gray-50">
+                      <div className="flex items-center gap-3">
+                         <motion.div 
+                           whileHover={{ scale: 1.1 }}
+                           className="relative"
+                         >
+                            <div className={`w-3 h-3 rounded-full ${schedule.servings_remaining > 0 ? 'bg-green-500' : 'bg-red-400'}`} />
+                            {schedule.servings_remaining > 0 && (
+                              <motion.span 
+                                initial={{ scale: 1.5, opacity: 0 }}
+                                animate={{ scale: 2, opacity: 0 }}
+                                transition={{ duration: 1, repeat: Infinity }}
+                                className="absolute inset-0 w-3 h-3 rounded-full bg-green-500"
+                              />
+                            )}
+                         </motion.div>
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                            {schedule.servings_remaining > 0 ? `${schedule.servings_remaining} Servings Left` : 'Fully Booked'}
+                          </p>
+                      </div>
+                      {schedule.servings_remaining > 0 ? (
+                        <motion.button 
+                         whileHover={{ scale: 1.02 }}
+                         whileTap={{ scale: 0.98 }}
+                         onClick={() => handleInstantBuy(schedule)}
+                         className="px-6 py-3 bg-[#268C7F] text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-[#268C7F]/20 flex items-center gap-2 hover:shadow-xl hover:shadow-[#268C7F]/30 transition-all"
+                        >
+                           {addedIds.has(schedule.id) ? (
+                             <span className="flex items-center gap-2">
+                                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}><Check size={14} /></motion.span> 
+                                <ShoppingBag size={14} /> Confirmed
+                             </span>
+                           ) : (
+                             <>
+                               Instant Buy <ArrowRight size={14} />
+                             </>
+                           )}
+                        </motion.button>
+                      ) : (
+                        <button 
+                          onClick={() => window.location.href = `https://wa.me/917904935160?text=I'd like to book ${schedule.dishes?.name} for ${schedule.scheduled_date}`}
+                         className="text-[10px] font-black text-[#268C7F] uppercase tracking-widest border border-[#268C7F]/20 px-4 py-2 rounded-xl hover:bg-[#268C7F]/5 transition-colors flex items-center gap-1"
+                        >
+                          Contact <MessageCircleHeart size={12} />
+                        </button>
+                      )}
+                    </div>
+                  </BentoCard>
+                </motion.div>
               ))}
 
               {!hasItems && (
@@ -330,11 +436,16 @@ export default function SchedulePage() {
 
               <div className="relative mb-6">
                  <Search className="absolute left-4 top-3.5 text-gray-300" size={16} />
-                 <input className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:border-[#268C7F]" placeholder="Search catalog..." />
+                 <input 
+                   className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:border-[#268C7F]" 
+                   placeholder="Search catalog..."
+                   value={dishSearch}
+                   onChange={(e) => setDishSearch(e.target.value)}
+                 />
               </div>
 
               <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-hide">
-                 {availableDishes.map(dish => {
+                 {filteredDishes.map(dish => {
                     const isAlreadyScheduled = kitchenSchedules.some(s => s.dishes.id === dish.id) || userBatches.some(b => b.dishes.id === dish.id)
                     return (
                       <button 
@@ -353,8 +464,8 @@ export default function SchedulePage() {
                             <p className="font-bold text-gray-800 text-sm truncate">{dish.name}</p>
                             <div className="flex items-center gap-2">
                                <p className="text-[10px] text-[#268C7F] font-black uppercase tracking-tighter">
-                                 {isAlreadyScheduled ? 'Already Preparing' : `$${dish.price}`}
-                               </p>
+                                  {isAlreadyScheduled ? 'Already Preparing' : '₹' + dish.price}
+                                </p>
                                {isAlreadyScheduled && <div className="w-1 h-1 rounded-full bg-orange-400 animate-pulse" />}
                             </div>
                          </div>

@@ -133,7 +133,7 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
               <>
                 <div className="flex flex-col">
                    <span className="text-[10px] text-white/50 font-black uppercase tracking-widest mb-1.5">Price</span>
-                   <span className="text-2xl font-black text-white leading-none tabular-nums tracking-tighter shadow-sm">${currentDish.price}</span>
+                   <span className="text-2xl font-black text-white leading-none tabular-nums tracking-tighter shadow-sm">{'₹' + currentDish.price}</span>
                 </div>
                 <MatteButton size="md" variant="teal" className="rounded-2xl px-10 shadow-xl" onClick={handleAddToCart}>
                    Experience

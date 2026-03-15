@@ -51,7 +51,7 @@ export default function AdminDashboard() {
   }, [supabase])
 
   const stats = [
-    { label: 'Revenue', value: `$${metrics.totalRevenue.toFixed(0)}`, icon: TrendingUp, color: 'text-[#268C7F]', bg: 'bg-[#268C7F]/5' },
+    { label: 'Revenue', value: `₹${metrics.totalRevenue.toFixed(0)}`, icon: TrendingUp, color: 'text-[#268C7F]', bg: 'bg-[#268C7F]/5' },
     { label: 'Verify', value: metrics.pendingPayments, icon: Package, color: 'text-[#E1803A]', bg: 'bg-[#E1803A]/5', alert: metrics.pendingPayments > 0 },
     { label: 'Requests', value: metrics.newRequests, icon: BellRing, color: 'text-[#CE9146]', bg: 'bg-[#CE9146]/5', alert: metrics.newRequests > 0 },
     { label: 'Batches', value: metrics.activeBatches, icon: ChefHat, color: 'text-[#6984A9]', bg: 'bg-[#6984A9]/5' }

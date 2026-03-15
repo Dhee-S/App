@@ -6,7 +6,7 @@ import { BentoCard } from '@/components/BentoCard'
 import { MatteButton } from '@/components/MatteButton'
 import { format, addDays, isSameDay, parseISO } from 'date-fns'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, User, ChefHat, Check, X, Sparkles, Clock, MapPin, ChevronRight } from 'lucide-react'
+import { Calendar, User, ChefHat, Check, X, Sparkles, Clock, MapPin, ChevronRight, Utensils, Send, PartyPopper } from 'lucide-react'
 import { useToast } from '@/components/Toast'
 import Image from 'next/image'
 
@@ -45,17 +45,28 @@ export default function RequestHub({
   }, [selectedDate, supabase])
 
   const handleDecision = async (id: string, status: 'accepted' | 'declined') => {
+    const request = requests.find(r => r.id === id)
+    
     const { error } = await supabase
       .from('requests')
       .update({ status })
       .eq('id', id)
     
-    if (!error) {
-      fetchRequests()
-      showToast(`Request ${status === 'accepted' ? 'incorporated into batch' : 'declined'}.`, status === 'accepted' ? 'success' : 'info')
+    if (!error && status === 'accepted' && request) {
+      await supabase.from('schedules').insert({
+        dish_id: request.dish_id,
+        scheduled_date: request.requested_date,
+        is_kitchen_scheduled: true,
+        servings_remaining: request.quantity || 10
+      })
+      showToast('Request incorporated into batch. Schedule created.', 'success')
+    } else if (!error) {
+      showToast('Request declined.', 'info')
     } else {
       showToast(`Coordination error: ${error.message}`, 'error')
     }
+    
+    fetchRequests()
   }
 
   const pending = requests.filter(r => r.status === 'pending')
@@ -74,18 +85,27 @@ export default function RequestHub({
       {/* Date Scroller */}
       <div className="relative shrink-0">
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x px-1">
-          {dates.map((date) => {
+          {dates.map((date, idx) => {
             const isSelected = isSameDay(date, selectedDate)
             return (
-              <button
+              <motion.button
                 key={date.toISOString()}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.03 }}
                 onClick={() => setSelectedDate(date)}
                 className={`snap-center flex flex-col items-center justify-center min-w-[64px] h-20 rounded-2xl transition-all duration-500 relative overflow-hidden ${
                   isSelected 
                     ? 'bg-[#268C7F] text-white shadow-xl shadow-[#268C7F]/20 scale-105' 
-                    : 'bg-white text-gray-400 border border-gray-100 shadow-sm'
+                    : 'bg-white text-gray-400 border border-gray-100 shadow-sm hover:border-[#268C7F]/30'
                 }`}
               >
+                {isSelected && (
+                  <motion.div 
+                    layoutId="selection-bg"
+                    className="absolute inset-0 bg-gradient-to-b from-[#268C7F] to-[#1E7469]" 
+                  />
+                )}
                 <span className={`relative text-[10px] font-black uppercase tracking-widest ${isSelected ? 'text-white/70' : 'text-gray-300'}`}>
                   {format(date, 'MMM')}
                 </span>
@@ -95,7 +115,15 @@ export default function RequestHub({
                 {isSelected && (
                   <motion.div layoutId="selection-dot" className="absolute bottom-2 w-1 h-1 bg-white rounded-full" />
                 )}
-              </button>
+                {!isSelected && (
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2 + idx * 0.03 }}
+                    className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" 
+                  />
+                )}
+              </motion.button>
             )
           })}
         </div>
@@ -116,51 +144,100 @@ export default function RequestHub({
               {pending.map((req, idx) => (
                 <motion.div
                   key={req.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ delay: idx * 0.05 }}
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9, x: -100 }}
+                  transition={{ delay: idx * 0.05, type: "spring", stiffness: 300, damping: 25 }}
                 >
-                  <BentoCard className="p-5 flex flex-col gap-4 border-gray-100 shadow-lg shadow-black/[0.02]">
-                    <div className="flex gap-4">
-                       <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-gray-50 flex-shrink-0">
+                  <BentoCard className="p-5 flex flex-col gap-4 border-gray-100 shadow-lg shadow-black/[0.02] overflow-hidden relative">
+                    {/* Animated glow for pending */}
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 + idx * 0.1 }}
+                      className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 via-orange-400 to-amber-400" 
+                    />
+                    <motion.div 
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 + idx * 0.05 }}
+                      className="flex gap-4"
+                    >
+                       <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-gray-50 flex-shrink-0 shadow-inner">
                           {req.dishes?.image_url ? (
                             <Image src={req.dishes.image_url} alt={req.dishes.name} fill className="object-cover" />
                           ) : (
                             <ChefHat className="w-full h-full p-4 text-gray-200" />
                           )}
+                          <motion.div 
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.2 + idx * 0.05, type: "spring" }}
+                            className="absolute -bottom-1 -right-1 w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center shadow-lg"
+                          >
+                            <Utensils size={12} className="text-white" />
+                          </motion.div>
                        </div>
                        <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-start">
-                            <p className="text-[9px] font-black uppercase tracking-widest text-[#268C7F] mb-1">New Suggestion</p>
-                            {req.quantity > 1 && (
-                              <span className="bg-[#268C7F]/5 text-[#268C7F] text-[9px] font-black px-2 py-0.5 rounded-lg border border-[#268C7F]/10">
-                                {req.quantity} UNITS
-                              </span>
-                            )}
-                          </div>
-                          <h3 className="text-lg font-black text-gray-800 leading-tight truncate">{req.dishes?.name}</h3>
-                          <div className="flex items-center gap-2 mt-2">
-                             <div className="w-5 h-5 rounded-full bg-gray-50 flex items-center justify-center text-gray-400"><User size={10} /></div>
-                             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">{req.profiles?.full_name || 'Guest Explorer'}</p>
-                          </div>
+                           <div className="flex justify-between items-start">
+                             <motion.p 
+                               initial={{ opacity: 0, x: -10 }}
+                               animate={{ opacity: 1, x: 0 }}
+                               transition={{ delay: 0.15 + idx * 0.05 }}
+                               className="text-[9px] font-black uppercase tracking-widest text-amber-500 flex items-center gap-1"
+                             >
+                               <Sparkles size={10} className="animate-spin" style={{ animationDuration: '3s' }} />
+                               New Request
+                             </motion.p>
+                             {req.quantity > 1 && (
+                               <motion.span 
+                                 initial={{ scale: 0 }}
+                                 animate={{ scale: 1 }}
+                                 transition={{ delay: 0.2 + idx * 0.05 }}
+                                 className="bg-amber-100 text-amber-600 text-[9px] font-black px-2 py-0.5 rounded-lg"
+                               >
+                                 {req.quantity} UNITS
+                               </motion.span>
+                             )}
+                           </div>
+                           <h3 className="text-lg font-black text-gray-800 leading-tight truncate">{req.dishes?.name}</h3>
+                           <div className="flex items-center gap-2 mt-2">
+                              <motion.div 
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.25 + idx * 0.05 }}
+                                className="w-5 h-5 rounded-full bg-gray-50 flex items-center justify-center text-gray-400"
+                              >
+                                <User size={10} />
+                              </motion.div>
+                              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">{req.profiles?.full_name || 'Guest Explorer'}</p>
+                           </div>
                        </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="flex gap-3 pt-2">
+                    <motion.div 
+                      initial={{ y: 10, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.3 + idx * 0.05 }}
+                      className="flex gap-3 pt-2"
+                    >
                        <button 
-                        onClick={() => handleDecision(req.id, 'declined')}
-                        className="flex-1 h-12 rounded-xl bg-gray-50 border border-gray-100 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
-                       >
-                         <X size={16} /> Decline
-                       </button>
-                       <button 
-                        onClick={() => handleDecision(req.id, 'accepted')}
-                        className="flex-[2] h-12 rounded-xl bg-[#268C7F] text-white shadow-lg shadow-[#268C7F]/20 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-transform active:scale-95"
-                       >
-                         <Check size={16} /> Orchestrate Batch
-                       </button>
-                    </div>
+                         onClick={() => handleDecision(req.id, 'declined')}
+                         className="flex-1 h-12 rounded-xl bg-gray-50 border border-gray-100 text-gray-400 hover:text-red-500 hover:bg-red-50 hover:border-red-200 transition-all flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest group"
+                        >
+                          <X size={16} className="group-hover:rotate-90 transition-transform" /> Decline
+                        </button>
+                        <button 
+                         onClick={() => handleDecision(req.id, 'accepted')}
+                         className="flex-[2] h-12 rounded-xl bg-[#268C7F] text-white shadow-lg shadow-[#268C7F]/20 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-transform active:scale-95 hover:shadow-xl hover:shadow-[#268C7F]/30"
+                        >
+                          <Check size={16} /> 
+                          <span className="flex items-center gap-1">
+                            Orchestrate 
+                            <ChefHat size={12} />
+                          </span>
+                        </button>
+                    </motion.div>
                   </BentoCard>
                 </motion.div>
               ))}
@@ -179,26 +256,64 @@ export default function RequestHub({
 
         {/* Accepted Section */}
         <section className="space-y-4">
-          <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] px-1">Active Batch Commitments</h2>
+          <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] px-1 flex items-center gap-2">
+            Active Batch Commitments
+            {accepted.length > 0 && (
+              <motion.span 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="w-2 h-2 bg-green-400 rounded-full"
+              >
+                <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping" />
+              </motion.span>
+            )}
+          </h2>
           <div className="space-y-3">
-             {accepted.map(req => (
-               <div key={req.id} className="group relative p-4 bg-white border border-gray-100 rounded-3xl shadow-sm flex items-center justify-between hover:border-[#268C7F]/30 transition-colors">
+             {accepted.map((req, idx) => (
+               <motion.div 
+                 key={req.id}
+                 initial={{ opacity: 0, x: 20 }}
+                 animate={{ opacity: 1, x: 0 }}
+                 transition={{ delay: idx * 0.1 }}
+                 className="group relative p-4 bg-white border border-gray-100 rounded-3xl shadow-sm flex items-center justify-between hover:border-[#268C7F]/30 transition-all hover:shadow-md"
+               >
+                  <motion.div 
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.1 + idx * 0.1 }}
+                    className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#268C7F] to-green-400 rounded-t-3xl opacity-0 group-hover:opacity-100 transition-opacity" 
+                  />
                   <div className="flex items-center gap-4">
-                     <div className="w-10 h-10 rounded-xl bg-[#268C7F]/5 text-[#268C7F] flex items-center justify-center">
-                        <Check size={18} strokeWidth={3} />
-                     </div>
+                     <motion.div 
+                       whileHover={{ rotate: 360 }}
+                       transition={{ duration: 0.6 }}
+                       className="w-10 h-10 rounded-xl bg-[#268C7F]/10 text-[#268C7F] flex items-center justify-center"
+                     >
+                        <ChefHat size={18} />
+                     </motion.div>
                      <div>
                         <p className="font-bold text-gray-800 text-sm leading-tight">{req.dishes?.name}</p>
-                        <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mt-1">Initiated by {req.profiles?.full_name}</p>
+                        <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mt-1 flex items-center gap-1">
+                          <User size={10} /> Initiated by {req.profiles?.full_name}
+                        </p>
                      </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center group-hover:bg-[#268C7F] group-hover:text-white transition-colors">
+                  <motion.div 
+                    whileHover={{ scale: 1.1 }}
+                    className="w-8 h-8 rounded-full bg-gray-50 text-gray-400 flex items-center justify-center group-hover:bg-[#268C7F] group-hover:text-white transition-colors"
+                  >
                      <ChevronRight size={14} />
-                  </div>
-               </div>
+                  </motion.div>
+               </motion.div>
              ))}
              {accepted.length === 0 && (
-               <p className="text-center py-4 text-[10px] font-black text-gray-200 uppercase tracking-widest italic">No accepted trajectories yet.</p>
+               <motion.div 
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 className="py-8 text-center"
+               >
+                 <p className="text-center py-4 text-[10px] font-black text-gray-200 uppercase tracking-widest italic">No accepted trajectories yet.</p>
+               </motion.div>
              )}
           </div>
         </section>
