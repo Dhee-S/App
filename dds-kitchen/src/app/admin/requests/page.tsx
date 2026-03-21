@@ -27,6 +27,12 @@ export default function RequestHub({
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const [kitchenSchedules, setKitchenSchedules] = useState<any[]>([])
+  const fetchKitchenSchedules = async () => {
+    const dateStr = format(selectedDate, 'yyyy-MM-dd')
+    const { data } = await supabase.from('schedules').select('*, dishes(*)').eq('scheduled_date', dateStr)
+    setKitchenSchedules(data || [])
+  }
   const [requestSummary, setRequestSummary] = useState<Record<string, { status: 'admin_scheduled' | 'accepted_request' | 'pending_request' | 'none' }>>({})
   
   // Direct Scheduling State
@@ -56,6 +62,7 @@ export default function RequestHub({
 
   useEffect(() => {
     fetchRequests()
+    fetchKitchenSchedules()
   }, [selectedDate, supabase])
 
   useEffect(() => {
@@ -97,13 +104,27 @@ export default function RequestHub({
       .eq('id', id)
     
     if (!error && status === 'accepted' && request) {
-      await supabase.from('schedules').insert({
-        dish_id: request.dish_id,
-        scheduled_date: request.requested_date,
-        is_kitchen_scheduled: true,
-        servings_remaining: request.quantity || 10
-      })
-      showToast('Request incorporated into batch. Schedule created.', 'success')
+      // Check for existing schedule to avoid unique constraint crash
+      const { data: existing } = await supabase
+        .from('schedules')
+        .select('*')
+        .eq('scheduled_date', request.requested_date)
+        .eq('dish_id', request.dish_id)
+        .single()
+        
+      if (existing) {
+         await supabase.from('schedules').update({
+            servings_remaining: existing.servings_remaining + (request.quantity || 1)
+         }).eq('id', existing.id)
+      } else {
+         await supabase.from('schedules').insert({
+           dish_id: request.dish_id,
+           scheduled_date: request.requested_date,
+           is_kitchen_scheduled: true,
+           servings_remaining: request.quantity || 10
+         })
+      }
+      showToast('Request incorporated into batch. Schedule updated.', 'success')
     } else if (!error) {
       showToast('Request declined.', 'info')
     } else {
@@ -111,27 +132,45 @@ export default function RequestHub({
     }
     
     fetchRequests()
+    fetchKitchenSchedules() // Refresh admin view of schedules
   }
 
   const handleCreateSchedule = async () => {
     if (!scheduleDish) return
     setIsScheduling(true)
     
-    const { error } = await supabase.from('schedules').insert({
-      dish_id: scheduleDish.id,
-      scheduled_date: format(selectedDate, 'yyyy-MM-dd'),
-      is_kitchen_scheduled: true,
-      servings_remaining: scheduleQty
-    })
+    const dateStr = format(selectedDate, 'yyyy-MM-dd')
+    const { data: existing } = await supabase
+      .from('schedules')
+      .select('*')
+      .eq('scheduled_date', dateStr)
+      .eq('dish_id', scheduleDish.id)
+      .single()
+      
+    let error;
+    if (existing) {
+       const res = await supabase.from('schedules').update({
+         servings_remaining: existing.servings_remaining + scheduleQty
+       }).eq('id', existing.id)
+       error = res.error
+    } else {
+       const res = await supabase.from('schedules').insert({
+         dish_id: scheduleDish.id,
+         scheduled_date: dateStr,
+         is_kitchen_scheduled: true,
+         servings_remaining: scheduleQty
+       })
+       error = res.error
+    }
     
     if (!error) {
       showToast('Scheduled successfully!', 'success')
       setShowScheduleModal(false)
       setScheduleDish(null)
       fetchRequests() 
-      // Re-trigger summary
-      const todayStr = format(new Date(), 'yyyy-MM-dd')
-      const { data } = await supabase.from('schedules').select('scheduled_date').gte('scheduled_date', todayStr)
+      fetchKitchenSchedules()
+      
+      const { data } = await supabase.from('schedules').select('scheduled_date').gte('scheduled_date', format(new Date(), 'yyyy-MM-dd'))
       const current = { ...requestSummary }
       data?.forEach(s => current[s.scheduled_date] = { status: 'admin_scheduled' })
       setRequestSummary(current)
@@ -295,7 +334,44 @@ export default function RequestHub({
           </div>
         </section>
 
+        
+        {/* Kitchen Batches Section */}
+        <section className="space-y-4">
+          <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] px-1 flex items-center gap-2">
+            Dishes Added to Kitchen
+          </h2>
+          <div className="space-y-3">
+             {kitchenSchedules.map((sched, idx) => (
+               <motion.div 
+                 key={sched.id}
+                 initial={{ opacity: 0, x: 20 }}
+                 animate={{ opacity: 1, x: 0 }}
+                 transition={{ delay: idx * 0.1 }}
+                 className="group relative p-4 bg-orange-50/50 border border-orange-100 rounded-3xl shadow-sm flex items-center justify-between"
+               >
+                  <div className="flex items-center gap-4">
+                     <div className="w-10 h-10 rounded-xl bg-orange-100 text-[#E1803A] flex items-center justify-center">
+                        <ChefHat size={18} />
+                     </div>
+                     <div>
+                        <p className="font-bold text-gray-800 text-sm leading-tight">{sched.dishes?.name}</p>
+                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1">
+                          {sched.servings_remaining} Servings Remaining
+                        </p>
+                     </div>
+                  </div>
+               </motion.div>
+             ))}
+             {kitchenSchedules.length === 0 && (
+               <div className="py-8 text-center text-[10px] font-black text-gray-200 uppercase tracking-widest italic">
+                 No dishes scheduled.
+               </div>
+             )}
+          </div>
+        </section>
+
         {/* Accepted Section */}
+
         <section className="space-y-4">
           <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] px-1 flex items-center gap-2">
             Active Batch Commitments
