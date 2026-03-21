@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { BentoCard } from '@/components/BentoCard'
 import { MatteButton } from '@/components/MatteButton'
+import { CalendarGrid } from '@/components/CalendarGrid'
 import { format, addDays, isSameDay, parseISO } from 'date-fns'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar, User, ChefHat, Check, X, Sparkles, Clock, MapPin, ChevronRight, Utensils, Send, PartyPopper } from 'lucide-react'
@@ -19,13 +20,13 @@ export default function RequestHub({
   const params = use(searchParams)
   const { showToast } = useToast()
   const today = new Date()
-  const dates = Array.from({ length: 14 }).map((_, i) => addDays(today, i))
   
   const [selectedDate, setSelectedDate] = useState(
     params.date ? parseISO(params.date) : today
   )
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [requestSummary, setRequestSummary] = useState<any>({})
 
   const fetchRequests = async () => {
     setLoading(true)
@@ -43,6 +44,25 @@ export default function RequestHub({
   useEffect(() => {
     fetchRequests()
   }, [selectedDate, supabase])
+
+  useEffect(() => {
+    async function fetchSummary() {
+      const todayStr = format(new Date(), 'yyyy-MM-dd')
+      const { data } = await supabase
+        .from('requests')
+        .select('requested_date, status')
+        .gte('requested_date', todayStr)
+      
+      const summary: any = {}
+      data?.forEach((r: any) => {
+        if (!summary[r.requested_date]) summary[r.requested_date] = {}
+        if (r.status === 'pending') summary[r.requested_date].hasRequests = true
+        if (r.status === 'accepted') summary[r.requested_date].hasSchedule = true
+      })
+      setRequestSummary(summary)
+    }
+    fetchSummary()
+  }, [supabase])
 
   const handleDecision = async (id: string, status: 'accepted' | 'declined') => {
     const request = requests.find(r => r.id === id)
@@ -82,51 +102,12 @@ export default function RequestHub({
         <h1 className="text-4xl font-black text-gray-800 tracking-tighter shiny-text">Request Hub</h1>
       </header>
 
-      {/* Date Scroller */}
-      <div className="relative shrink-0">
-        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x px-1">
-          {dates.map((date, idx) => {
-            const isSelected = isSameDay(date, selectedDate)
-            return (
-              <motion.button
-                key={date.toISOString()}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.03 }}
-                onClick={() => setSelectedDate(date)}
-                className={`snap-center flex flex-col items-center justify-center min-w-[64px] h-20 rounded-2xl transition-all duration-500 relative overflow-hidden ${
-                  isSelected 
-                    ? 'bg-[#268C7F] text-white shadow-xl shadow-[#268C7F]/20 scale-105' 
-                    : 'bg-white text-gray-400 border border-gray-100 shadow-sm hover:border-[#268C7F]/30'
-                }`}
-              >
-                {isSelected && (
-                  <motion.div 
-                    layoutId="selection-bg"
-                    className="absolute inset-0 bg-gradient-to-b from-[#268C7F] to-[#1E7469]" 
-                  />
-                )}
-                <span className={`relative text-[10px] font-black uppercase tracking-widest ${isSelected ? 'text-white/70' : 'text-gray-300'}`}>
-                  {format(date, 'MMM')}
-                </span>
-                <span className="relative text-xl font-black mt-1">
-                  {format(date, 'd')}
-                </span>
-                {isSelected && (
-                  <motion.div layoutId="selection-dot" className="absolute bottom-2 w-1 h-1 bg-white rounded-full" />
-                )}
-                {!isSelected && (
-                  <motion.div 
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2 + idx * 0.03 }}
-                    className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" 
-                  />
-                )}
-              </motion.button>
-            )
-          })}
-        </div>
+      <div className="flex justify-center w-full relative z-10 -mt-2 mb-2">
+        <CalendarGrid 
+          selectedDate={selectedDate} 
+          onSelectDate={setSelectedDate} 
+          indicators={requestSummary} 
+        />
       </div>
 
       <div className="flex-1 space-y-8">

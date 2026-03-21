@@ -159,3 +159,22 @@ Develop reusable components based on the Stitch designs using the extracted desi
    - User schedule: Shows quantity requested for community batches
    - Admin requests: Creates schedule automatically when accepting a request
    - Admin requests: Proper workflow from request → accepted → schedule created
+
+## Discoveries
+
+- Previous `$` → `₹` replacement broke template literals: `₹{variable}` instead of `${variable}`
+- Cart page was breaking due to `useToast` returning undefined - added fallback
+- "Community batch" (user requests) caused confusion - removed entirely
+- Orders table needs storage bucket for payment screenshots
+- Navigation using `window.location.href` breaks with basePath - use `<Link>` instead
+
+## Accomplished
+
+1. ✅ Fixed broken template literals across all pages (orders, cart, schedule, admin)
+2. ✅ Fixed cart page payment flow with proper error handling
+3. ✅ Added GPay phone number copy feature with animation
+4. ✅ Fixed navigation links (Discover Dishes button)
+5. ✅ Simplified schedule page - removed community batch concept
+6. ✅ Improved date picker UI with "Today" label and better styling
+7. ✅ Admin requests creates schedule when accepting user requests
+8. ✅ Pushed all changes to git

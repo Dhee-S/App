@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { MatteButton } from '@/components/MatteButton'
 import { BentoCard } from '@/components/BentoCard'
+import { CalendarGrid } from '@/components/CalendarGrid'
 import { format, addDays, isSameDay } from 'date-fns'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar as CalendarIcon, ChefHat, Plus, Check, X, Search, Sparkles, Clock, UtensilsCrossed, ArrowRight, ShoppingBag, Flame, MessageCircleHeart } from 'lucide-react'
@@ -31,8 +32,6 @@ export default function SchedulePage() {
   const filteredDishes = availableDishes.filter(dish => 
     dish.name.toLowerCase().includes(dishSearch.toLowerCase())
   )
-
-  const dates = Array.from({ length: 14 }).map((_, i) => addDays(new Date(), i))
 
   useEffect(() => {
     async function fetchData() {
@@ -128,64 +127,12 @@ export default function SchedulePage() {
         <p className="text-sm font-subheading italic text-gray-400">Discover planned batches and suggest your own.</p>
       </header>
       
-      {/* Date Scroller */}
-      <div className="relative -mx-6 px-4">
-        <div className="flex gap-3 overflow-x-auto pb-6 scrollbar-hide snap-x">
-          {dates.map((date, idx) => {
-            const isSelected = isSameDay(date, selectedDate)
-            const hasSchedule = daySummary[format(date, 'yyyy-MM-dd')]?.hasSchedule
-            const isToday = isSameDay(date, new Date())
-            return (
-              <motion.button
-                key={date.toISOString()}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.03 }}
-                onClick={() => setSelectedDate(date)}
-                whileTap={{ scale: 0.95 }}
-                className={`snap-center flex flex-col items-center justify-center min-w-[68px] h-28 rounded-[1.5rem] transition-all duration-300 relative overflow-hidden ${
-                  isSelected 
-                    ? 'bg-gradient-to-b from-[#268C7F] to-[#1E7469] text-white shadow-2xl shadow-[#268C7F]/30 scale-105' 
-                    : 'bg-white text-gray-500 border border-gray-100 shadow-md hover:shadow-lg'
-                }`}
-              >
-                {isSelected && (
-                  <motion.div 
-                    layoutId="active-date" 
-                    className="absolute inset-0" 
-                  />
-                )}
-                
-                {/* Day name */}
-                <span className={`relative text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-white/80' : isToday ? 'text-[#268C7F]' : 'text-gray-400'}`}>
-                  {isToday ? 'Today' : format(date, 'EEE')}
-                </span>
-                
-                {/* Date number */}
-                <span className={`relative text-3xl font-black mt-1 ${isSelected ? 'text-white' : 'text-gray-800'}`}>
-                  {format(date, 'd')}
-                </span>
-                
-                {/* Month */}
-                <span className={`relative text-[9px] font-medium uppercase tracking-widest mt-0.5 ${isSelected ? 'text-white/60' : 'text-gray-300'}`}>
-                  {format(date, 'MMM')}
-                </span>
-                
-                {/* Schedule indicator */}
-                {hasSchedule && !isSelected && (
-                  <motion.div 
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute top-2 right-2 w-2 h-2 bg-orange-400 rounded-full"
-                  />
-                )}
-              </motion.button>
-            )
-          })}
-        </div>
-        
-        {/* Scroll hint */}
-        <div className="absolute right-0 top-0 bottom-6 w-12 bg-gradient-to-l from-[#f7f8f6] to-transparent pointer-events-none" />
+      <div className="flex justify-center w-full relative z-10 -mt-2 mb-2">
+        <CalendarGrid 
+          selectedDate={selectedDate} 
+          onSelectDate={setSelectedDate} 
+          indicators={daySummary} 
+        />
       </div>
 
       <div className="space-y-6">
