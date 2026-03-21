@@ -34,18 +34,7 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
   const y = useTransform(scrollY, [0, 300], [0, 80])
   const opacity = useTransform(scrollY, [0, 300], [1, 0.4])
 
-  const defaultSlide = {
-    id: 'brand-welcome',
-    name: "DD's Kitchen",
-    description: "Authentic, Small-Batch Homemade Meals.",
-    price: 0,
-    image_url: "/logo.jpg",
-    category: "Gourmet",
-    scheduled_date: new Date().toISOString(),
-    servings_remaining: 0
-  }
-
-  const activeDishes = dishes.length > 0 ? dishes : [defaultSlide]
+  const activeDishes = dishes.length > 0 ? dishes : []
   const currentDish = activeDishes[index] || activeDishes[0]
 
   useEffect(() => {
@@ -56,11 +45,9 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
     return () => clearInterval(interval)
   }, [activeDishes.length])
 
+  if (!currentDish) return null
+
   const handleAddToCart = () => {
-    if (currentDish.id === 'brand-welcome') {
-       window.scrollTo({ top: 600, behavior: 'smooth' })
-       return
-    }
     addItem({
       id: currentDish.id,
       name: currentDish.name,
@@ -107,19 +94,11 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
         >
           <div className="flex flex-col gap-1">
              <div className="flex items-center gap-2">
-                {currentDish.id === 'brand-welcome' ? (
-                  <div className="bg-[#268C7F] text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-[0.2em]">
-                    Authentic Homemade
-                  </div>
-                ) : (
-                  <>
-                    <div className="bg-[#CE9146] text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-[0.2em] flex items-center gap-2 shadow-lg">
-                      <Sparkles size={10} /> Just Special
-                    </div>
-                    {currentDish.servings_remaining !== undefined && (
-                      <span className="text-white text-[10px] font-black tracking-widest">{currentDish.servings_remaining} Servings Left</span>
-                    )}
-                  </>
+                <div className="bg-[#CE9146] text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-[0.2em] flex items-center gap-2 shadow-lg">
+                  <Sparkles size={10} /> Chef's Special
+                </div>
+                {currentDish.is_veg !== undefined && (
+                   <div className={`w-2 h-2 rounded-full ${currentDish.is_veg ? 'bg-green-500' : 'bg-red-500'} shadow-[0_0_8px] ${currentDish.is_veg ? 'shadow-green-500/40' : 'shadow-red-500/40'}`} />
                 )}
              </div>
           </div>
@@ -129,28 +108,18 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
                {currentDish.name}
              </h1>
              <p className="text-white/70 text-[11px] font-medium leading-relaxed italic line-clamp-2 max-w-[90%]">
-               {currentDish.id === 'brand-welcome' 
-                 ? "Our Protocol: Fresh ingredients, Small-batch, High-Trust Delivery."
-                 : currentDish.description}
+               {currentDish.description}
              </p>
           </div>
 
           <div className="flex items-center gap-6 pt-2">
-            {currentDish.id !== 'brand-welcome' ? (
-              <>
-                 <div className="flex flex-col">
-                   <span className="text-[10px] text-[#CE9146] font-black uppercase tracking-widest">Available On</span>
-                   <span className="text-sm font-black text-white">{new Date(currentDish.scheduled_date!).toLocaleDateString('en-IN', { day:'numeric', month:'short' })}</span>
-                </div>
-                <MatteButton size="md" variant="teal" className="rounded-2xl px-12 shadow-xl shadow-[#268C7F]/20" onClick={handleAddToCart}>
-                   Claim Now
-                </MatteButton>
-              </>
-            ) : (
-               <MatteButton size="md" variant="white" className="rounded-2xl px-12 text-[#268C7F] font-black shadow-xl" onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
-                  See Menu
-               </MatteButton>
-            )}
+             <div className="flex flex-col">
+               <span className="text-[10px] text-white/40 font-black uppercase tracking-widest">Experience For</span>
+               <span className="text-2xl font-black text-white leading-none tracking-tighter tabular-nums">{'₹' + currentDish.price}</span>
+            </div>
+            <MatteButton size="md" variant="teal" className="rounded-2xl px-12 shadow-xl shadow-[#268C7F]/20" onClick={handleAddToCart}>
+               Claim Now
+            </MatteButton>
           </div>
         </motion.div>
       </div>
