@@ -29,7 +29,7 @@ export default function OrderPipeline() {
     const { data } = await supabase
       .from('orders')
       .select('*, profiles(*), order_items(*, dishes(*))')
-      .in('status', ['pending_verification', 'pending', 'confirmed', 'preparing', 'ready'])
+      .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
       .order('created_at', { ascending: true })
     
     setOrders(data || [])
@@ -62,7 +62,7 @@ export default function OrderPipeline() {
     }
   }
 
-  const pendingPayments = orders.filter(o => !o.is_paid && o.status === 'pending_verification')
+  const pendingPayments = orders.filter(o => !o.is_paid && o.status === 'pending')
 
   const updateStatus = async (orderId: string, status: string) => {
     const { error } = await supabase
@@ -153,7 +153,7 @@ export default function OrderPipeline() {
       <div className="flex-1 flex gap-6 overflow-x-auto pb-8 snap-x scrollbar-hide">
 
         {lanes.map((lane, laneIdx) => {
-          const laneOrders = orders.filter(o => lane.status.includes(o.status))
+          const laneOrders = orders.filter(o => lane.status.includes(o.status) && o.is_paid === true)
           return (
             <motion.div
               key={lane.title}

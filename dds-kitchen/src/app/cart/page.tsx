@@ -6,7 +6,7 @@ import { BentoCard } from '@/components/BentoCard'
 import { useCart } from '@/store/useCart'
 import { createClient } from '@/utils/supabase/client'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Minus, Plus, ShieldCheck, X, Check, Loader2, ArrowRight } from 'lucide-react'
+import { Minus, Plus, ShoppingCart, Trash2, ArrowRight, ShieldCheck, Loader2, X, Check, Zap } from 'lucide-react'
 import { useToast } from '@/components/Toast'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -54,7 +54,7 @@ export default function CartPage() {
         .insert({
           user_id: user.id,
           total_amount: total,
-          status: 'pending_verification', // High-Trust zero-step skip directly to pending_verification
+          status: 'pending', // Awaiting admin settlement verification
           is_paid: false
         })
         .select()
@@ -220,69 +220,57 @@ export default function CartPage() {
                       <p className="text-sm text-gray-400 font-medium mt-1">Zero-Friction Gateway</p>
                     </div>
 
-                    <div className="bg-gray-50 rounded-3xl p-6 mx-auto border-4 border-dashed border-gray-100 flex flex-col items-center justify-center relative overflow-hidden min-h-[14rem]">
+                    <div className="bg-gray-100/50 rounded-[2.5rem] p-8 mx-auto border-2 border-dashed border-gray-100 flex flex-col items-center justify-center relative overflow-hidden min-h-[16rem]">
                        <div className="absolute inset-0 bg-gradient-to-br from-[#268C7F]/5 to-transparent" />
                        
                        {isMobile ? (
-                         <div className="text-center z-10 w-full space-y-6">
-                            <span className="text-5xl block animate-bounce" style={{animationDuration: '3s'}}>📱</span>
-                            
-                            <div className="grid grid-cols-1 gap-3 w-full">
-                               <a 
-                                 href={`upi://pay?pa=${upiId}&pn=${encodeURIComponent("DD's Kitchen")}&am=${total.toFixed(2)}&cu=INR&mode=02&purpose=00`} 
-                                 className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-[#268C7F] active:scale-95 transition-all text-left group"
-                               >
-                                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xs">GPay</div>
-                                  <div className="flex-1">
-                                     <p className="text-[10px] font-black uppercase tracking-widest text-[#268C7F]">Intent Protocol 01</p>
-                                     <p className="text-sm font-bold text-gray-700">Google Pay / Generic UPI</p>
-                                  </div>
-                                  <ArrowRight size={14} className="text-gray-300 group-hover:text-[#268C7F]" />
-                               </a>
-
-                               <a 
-                                 href={`phonepe://pay?pa=${upiId}&pn=${encodeURIComponent("DD's Kitchen")}&am=${total.toFixed(2)}&cu=INR&mode=02&purpose=00`} 
-                                 className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-purple-600 active:scale-95 transition-all text-left group"
-                               >
-                                  <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 font-black text-xs">PH</div>
-                                  <div className="flex-1">
-                                     <p className="text-[10px] font-black uppercase tracking-widest text-purple-500">Intent Protocol 02</p>
-                                     <p className="text-sm font-bold text-gray-700">PhonePe App</p>
-                                  </div>
-                                  <ArrowRight size={14} className="text-gray-300 group-hover:text-purple-600" />
-                               </a>
-
-                               <a 
-                                 href={`paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent("DD's Kitchen")}&am=${total.toFixed(2)}&cu=INR&mode=02&purpose=00`} 
-                                 className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-blue-400 active:scale-95 transition-all text-left group"
-                               >
-                                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-400 font-black text-xs">PY</div>
-                                  <div className="flex-1">
-                                     <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Intent Protocol 03</p>
-                                     <p className="text-sm font-bold text-gray-700">Paytm Digital Wallet</p>
-                                  </div>
-                                  <ArrowRight size={14} className="text-gray-300 group-hover:text-blue-400" />
-                               </a>
-                            </div>
-
-                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black">Tap to launch respective app</p>
-                         </div>
+                          <div className="text-center z-10 w-full space-y-6">
+                             <motion.div 
+                              initial={{ scale: 0.8, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              className="w-16 h-16 mx-auto rounded-2xl bg-white shadow-lg flex items-center justify-center p-3 border border-gray-50 relative"
+                             >
+                                <Image 
+                                  src="/upi-logo.png" 
+                                  alt="UPI Logo" 
+                                  fill 
+                                  className="object-contain p-2" 
+                                />
+                             </motion.div>
+                             
+                             <div className="w-full">
+                                <a 
+                                  href={`upi://pay?pa=${upiId}&pn=${encodeURIComponent("DD's Kitchen")}&am=${total.toFixed(2)}&cu=INR&mode=02&purpose=00`} 
+                                  className="flex items-center gap-4 bg-white p-5 rounded-3xl border border-gray-100 shadow-xl shadow-black/[0.02] hover:border-[#268C7F] active:scale-95 transition-all text-left group"
+                                >
+                                   <div className="w-10 h-10 rounded-xl bg-[#268C7F]/5 flex items-center justify-center text-[#268C7F]">
+                                      <Zap size={18} strokeWidth={3} />
+                                   </div>
+                                   <div className="flex-1">
+                                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#268C7F] mb-0.5">Intent Protocol 01</p>
+                                      <p className="text-sm font-black text-gray-800">Choose Payment Option</p>
+                                   </div>
+                                   <ArrowRight size={16} strokeWidth={3} className="text-gray-300 group-hover:text-[#268C7F]" />
+                                </a>
+                             </div>
+                             <p className="text-[9px] text-gray-400 uppercase tracking-widest font-black">Tap to launch any UPI app</p>
+                          </div>
                        ) : (
-                         <div className="z-10 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
-                            <QRCode value={`upi://pay?pa=${upiId}&pn=${encodeURIComponent("DD's Kitchen")}&am=${total.toFixed(2)}&cu=INR&mode=02&purpose=00`} size={150} fgColor="#268C7F" />
-                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mt-4">Scan using any UPI App</p>
-                         </div>
+                          <div className="z-10 bg-white p-6 rounded-3xl shadow-xl shadow-black/[0.03] border border-gray-50 flex flex-col items-center">
+                             <QRCode value={`upi://pay?pa=${upiId}&pn=${encodeURIComponent("DD's Kitchen")}&am=${total.toFixed(2)}&cu=INR&mode=02&purpose=00`} size={160} fgColor="#268C7F" />
+                             <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mt-4">Scan with any UPI App</p>
+                          </div>
                        )}
                     </div>
 
-                    <div className="bg-gray-50 rounded-2xl p-4 flex items-center gap-3 text-left">
-                       <ShieldCheck className="text-[#268C7F] shrink-0" size={24} />
+                    <div className="bg-white rounded-2xl p-4 flex items-center gap-3 text-left border border-gray-50 shadow-sm">
+                       <ShieldCheck className="text-[#268C7F] shrink-0" size={20} />
                        <p className="text-[11px] text-gray-500 font-medium leading-relaxed">
-                          We operate on a <span className="text-[#268C7F] font-black uppercase tracking-widest text-[10px]">High-Trust Protocol</span>. Once paid, simply confirm below.
+                          Secure Payment Method enabled. Your transaction is verified through the standard UPI gateway.
                        </p>
                     </div>
 
-                    <MatteButton size="md" variant="teal" className="w-full flex justify-center items-center gap-2" onClick={handleCheckoutSubmit} disabled={uploading}>
+                    <MatteButton size="md" variant="teal" className="w-full flex justify-center items-center gap-2 rounded-2xl" onClick={handleCheckoutSubmit} disabled={uploading}>
                        {uploading ? <Loader2 size={16} className="animate-spin" /> : "I've Paid " + '₹' + total.toFixed(2)}
                     </MatteButton>
                   </div>
