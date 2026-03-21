@@ -20,19 +20,29 @@ export async function signupClient(formData: FormData) {
   const password = formData.get('password') as string
   const fullName = formData.get('fullName') as string
 
-  const { error } = await supabase.auth.signUp({
+  const { data: signUpData, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
         full_name: fullName,
       },
-      emailRedirectTo: `${window.location.origin}/App/auth/callback/`,
+      emailRedirectTo: `${window.location.origin}/auth/callback/`,
     }
   })
 
   if (error) return { error: error.message }
-  return { success: true }
+  
+  // Create profile
+  if (signUpData.user) {
+    await supabase.from('profiles').insert({
+      id: signUpData.user.id,
+      full_name: fullName,
+      role: 'CUSTOMER'
+    })
+  }
+
+  return { success: true, user: signUpData.user }
 }
 
 export async function sendMagicLinkClient(formData: FormData) {

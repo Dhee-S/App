@@ -11,6 +11,24 @@ const merriweather = Merriweather({ subsets: ['latin'], weight: ['300', '400', '
 export const metadata: Metadata = {
   title: "DD's Kitchen",
   description: "Gourmet Marketplace & Kitchen Schedule",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "DD's Kitchen",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+}
+
+export const viewport = {
+  themeColor: "#268C7F",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 }
 
 import { Providers } from '@/components/Providers'

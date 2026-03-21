@@ -29,7 +29,8 @@ export default function CartPage() {
   const fees = items.length > 0 ? 5.00 : 0
   const total = subtotal + fees
   const upiId = process.env.NEXT_PUBLIC_UPI_ID || ''
-  const upiLink = `upi://pay?pa=${upiId}&pn=DD_KITCHEN&am=${total.toFixed(2)}&cu=INR`
+  // Hardened UPI Intent with standard parameters for better app compatibility
+  const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent("DD's Kitchen")}&am=${total.toFixed(2)}&cu=INR&mode=02&purpose=00`
 
   const handleCheckout = () => {
     setIsCheckingOut(true)

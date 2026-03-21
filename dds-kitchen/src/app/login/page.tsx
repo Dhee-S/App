@@ -3,114 +3,103 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { loginClient, signupClient, sendMagicLinkClient, forgotPasswordClient } from '@/utils/supabase/auth-client'
+import { createClient } from '@/utils/supabase/client'
+import { loginClient, signupClient, forgotPasswordClient } from '@/utils/supabase/auth-client'
+import { BentoCard } from '@/components/BentoCard'
+import { Sparkles, ArrowRight, User, Key, Mail, ChevronLeft, LayoutDashboard, Utensils } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [mode, setMode] = useState<'customer' | 'manager' | 'forgot'>('customer')
+  const supabase = createClient()
+  
   const [isLogin, setIsLogin] = useState(true)
+  const [showForgot, setShowForgot] = useState(false)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
 
-  async function handleCustomerAuth(formData: FormData) {
-    setLoading(true)
-    setMessage(null)
-    const action = isLogin ? loginClient : signupClient
-    const res = await action(formData)
-    if (res?.error) {
-      setMessage({ type: 'error', text: res.error })
+  const checkRoleAndRedirect = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.role === 'MANAGER') {
+      router.push('/admin/dash')
     } else {
       router.push('/')
     }
-    setLoading(false)
   }
 
-  async function handleForgotPassword(formData: FormData) {
+  async function handleSubmit(formData: FormData) {
     setLoading(true)
     setMessage(null)
-    const res = await forgotPasswordClient(formData)
-    if (res?.error) {
-      setMessage({ type: 'error', text: res.error })
-    } else if (res?.success) {
-      setMessage({ type: 'success', text: res.success })
+    
+    if (showForgot) {
+      const res = await forgotPasswordClient(formData)
+      if (res?.error) setMessage({ type: 'error', text: res.error })
+      else if (res?.success) setMessage({ type: 'success', text: res.success })
+      setLoading(false)
+      return
     }
-    setLoading(false)
-  }
 
-  async function handleManagerAuth(formData: FormData) {
-    setLoading(true)
-    setMessage(null)
-    const res = await sendMagicLinkClient(formData)
+    const action = isLogin ? loginClient : signupClient
+    const res = await action(formData)
+
     if (res?.error) {
-      setMessage({ type: 'error', text: res.error })
-    } else if (res?.success) {
-      setMessage({ type: 'success', text: res.success })
+       setMessage({ type: 'error', text: res.error })
+       setLoading(false)
+    } else {
+       // Check if user is logged in (Signup might not auto-login if confirmation is required)
+       const { data: { session } } = await supabase.auth.getSession()
+       if (session) {
+          await checkRoleAndRedirect()
+       } else {
+          setMessage({ type: 'success', text: 'Verification email sent! Please check your inbox for access.' })
+          setLoading(false)
+       }
     }
-    setLoading(false)
   }
 
   return (
-    <div className="min-h-[100dvh] w-full flex flex-col justify-center items-center p-6 mesh-bg relative overflow-hidden">
-      
-      <div className="absolute top-0 -left-20 w-72 h-72 bg-[#268C7F]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 -right-20 w-80 h-80 bg-[#E1803A]/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-[100dvh] w-full flex flex-col justify-center items-center p-6 mesh-bg overflow-hidden relative">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#268C7F]/10 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#E1803A]/10 rounded-full blur-[100px] animate-pulse" />
+      </div>
 
       <motion.div 
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }} 
         className="w-full max-w-sm z-10"
       >
-        <div className="mb-10 text-center">
-          <motion.h1 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-5xl font-display font-black tracking-tighter text-gray-800 mb-2 shiny-text"
+        <header className="mb-10 text-center">
+          <motion.div 
+            initial={{ scale: 0 }} 
+            animate={{ scale: 1 }} 
+            className="w-16 h-16 bg-white rounded-3xl shadow-xl flex items-center justify-center mx-auto mb-4 border border-gray-100"
           >
-            DD's Kitchen
-          </motion.h1>
-          <p className="font-subheading text-[#268C7F] text-lg italic tracking-wide">
-            A Gourmet Marketplace
-          </p>
-        </div>
+            <Utensils className="text-[#268C7F]" size={28} />
+          </motion.div>
+          <h1 className="text-4xl font-black text-gray-800 tracking-tighter shiny-text mb-1">DD's Kitchen</h1>
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400">Gourmet Protocol V2</p>
+        </header>
 
-        <div className="glass-card rounded-[2rem] p-8 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-white/50 to-transparent pointer-events-none" />
-
-          <div className="flex relative z-10 bg-gray-100 p-1.5 rounded-2xl mb-8">
-            <button
-              onClick={() => { setMode('customer'); setMessage(null) }}
-              className={`flex-1 py-2.5 text-sm font-display font-bold rounded-xl transition-all duration-300 ${
-                mode === 'customer' 
-                  ? 'bg-[#268C7F] text-white shadow-md' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Customer
-            </button>
-            <button
-              onClick={() => { setMode('manager'); setMessage(null) }}
-              className={`flex-1 py-2.5 text-sm font-display font-bold rounded-xl transition-all duration-300 ${
-                mode === 'manager' 
-                  ? 'bg-[#E1803A] text-white shadow-md' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Manager
-            </button>
-          </div>
+        <BentoCard className="p-8 relative overflow-hidden backdrop-blur-xl bg-white/70 border-gray-100 shadow-2xl">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#268C7F] via-[#E1803A] to-[#268C7F]" />
 
           <AnimatePresence mode="wait">
             {message && (
               <motion.div 
-                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                animate={{ opacity: 1, height: 'auto', marginBottom: 24 }}
-                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                className={`p-4 rounded-xl text-sm font-display font-medium border ${
-                  message.type === 'error' 
-                    ? 'bg-red-50 border-red-200 text-red-600' 
-                    : 'bg-green-50 border-green-200 text-green-600'
+                initial={{ opacity: 0, height: 0 }} 
+                animate={{ opacity: 1, height: 'auto' }} 
+                exit={{ opacity: 0, height: 0 }}
+                className={`mb-6 p-4 rounded-2xl text-[11px] font-black uppercase tracking-widest border ${
+                  message.type === 'error' ? 'bg-red-50 border-red-200 text-red-500' : 'bg-[#268C7F]/5 border-[#268C7F]/20 text-[#268C7F]'
                 }`}
               >
                 {message.text}
@@ -118,179 +107,81 @@ export default function LoginPage() {
             )}
           </AnimatePresence>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={mode + (isLogin ? 'login' : 'signup')}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              className="relative z-10"
+          <form action={handleSubmit} className="space-y-4">
+            <h2 className="text-xl font-black text-gray-800 mb-6 flex items-center gap-2">
+              {showForgot ? 'Reset Access' : isLogin ? 'Welcome Back' : 'Create Account'}
+              <Sparkles size={16} className="text-[#268C7F]" />
+            </h2>
+
+            {!isLogin && !showForgot && (
+              <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Identity</label>
+                <div className="relative">
+                  <User size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                  <input name="fullName" type="text" required placeholder="Chef Name" className="w-full bg-gray-50/50 border border-gray-100 rounded-2xl px-10 py-3.5 text-sm focus:outline-none focus:border-[#268C7F] focus:ring-4 focus:ring-[#268C7F]/5 transition-all text-gray-800 font-bold" />
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
+              <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Terminal</label>
+              <div className="relative">
+                <Mail size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                <input name="email" type="email" required placeholder="you@kitchen.com" className="w-full bg-gray-50/50 border border-gray-100 rounded-2xl px-10 py-3.5 text-sm focus:outline-none focus:border-[#268C7F] focus:ring-4 focus:ring-[#268C7F]/5 transition-all text-gray-800 font-bold" />
+              </div>
+            </div>
+
+            {!showForgot && (
+              <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Secure Pass</label>
+                <div className="relative">
+                  <Key size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" />
+                  <input name="password" type="password" required placeholder="••••••••" className="w-full bg-gray-50/50 border border-gray-100 rounded-2xl px-10 py-3.5 text-sm focus:outline-none focus:border-[#268C7F] focus:ring-4 focus:ring-[#268C7F]/5 transition-all text-gray-800 font-bold" />
+                </div>
+              </div>
+            )}
+
+            <motion.button 
+              whileHover={{ scale: 1.02 }} 
+              whileTap={{ scale: 0.98 }} 
+              disabled={loading}
+              className="w-full bg-gray-800 text-white font-black uppercase tracking-[0.2em] text-[11px] py-4 rounded-2xl shadow-xl shadow-gray-200 hover:bg-black transition-all flex items-center justify-center gap-2 group mt-4 overflow-hidden relative"
             >
-              {mode === 'customer' ? (
-                <form action={handleCustomerAuth} className="space-y-5">
-                  <div className="text-center mb-6">
-                    <h2 className="font-heading text-2xl text-gray-800 font-bold">
-                      {isLogin ? 'Welcome Back' : 'Join the Kitchen'}
-                    </h2>
-                    <p className="font-body text-xs text-gray-500 mt-1">
-                      {isLogin ? 'Access your exclusive menu.' : 'Discover curated gourmet dishes.'}
-                    </p>
-                  </div>
-
-                  {!isLogin && (
-                    <div className="space-y-1">
-                      <label className="text-xs font-display font-bold text-gray-600 uppercase tracking-wider ml-1">Full Name</label>
-                      <input
-                        name="fullName"
-                        type="text"
-                        required
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-3.5 text-gray-800 font-body focus:outline-none focus:border-[#268C7F] focus:ring-1 focus:ring-[#268C7F]/50 transition-all placeholder:text-gray-400"
-                        placeholder="John Doe"
-                      />
-                    </div>
-                  )}
-                  <div className="space-y-1">
-                    <label className="text-xs font-display font-bold text-gray-600 uppercase tracking-wider ml-1">Email</label>
-                    <input
-                      name="email"
-                      type="email"
-                      required
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-3.5 text-gray-800 font-body focus:outline-none focus:border-[#268C7F] focus:ring-1 focus:ring-[#268C7F]/50 transition-all placeholder:text-gray-400"
-                      placeholder="you@example.com"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-display font-bold text-gray-600 uppercase tracking-wider ml-1">Password</label>
-                    <input
-                      name="password"
-                      type="password"
-                      required
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-3.5 text-gray-800 font-body focus:outline-none focus:border-[#268C7F] focus:ring-1 focus:ring-[#268C7F]/50 transition-all placeholder:text-gray-400"
-                      placeholder="••••••••"
-                    />
-                  </div>
-                  
-                  <motion.button
-                    whileTap={{ scale: 0.97 }}
-                    disabled={loading}
-                    className="w-full bg-[#268C7F] hover:bg-[#1E7469] text-white font-display font-bold text-lg py-4 rounded-xl shadow-md mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account'}
-                  </motion.button>
-
-                  <div className="flex flex-col gap-3 mt-6">
-                    <button
-                      type="button"
-                      onClick={() => { setIsLogin(!isLogin); setMessage(null); }}
-                      className="text-sm font-subheading text-gray-500 hover:text-gray-700 transition-colors underline decoration-gray-300 underline-offset-4"
-                    >
-                      {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-                    </button>
-                    
-                    {isLogin && (
-                      <button
-                        type="button"
-                        onClick={() => { setMode('forgot'); setMessage(null); }}
-                        className="text-xs font-subheading text-[#268C7F] hover:text-[#1E7469] transition-colors"
-                      >
-                        Forgot password?
-                      </button>
-                    )}
-                  </div>
-                </form>
-              ) : mode === 'forgot' ? (
-                <form action={handleForgotPassword} className="space-y-5">
-                   <div className="text-center mb-6">
-                    <h2 className="font-heading text-2xl text-gray-800 font-bold">
-                      Reset Password
-                    </h2>
-                    <p className="font-body text-xs text-gray-500 mt-1">
-                      Enter your email to receive a reset link.
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-display font-bold text-gray-600 uppercase tracking-wider ml-1">Email</label>
-                    <input
-                      name="email"
-                      type="email"
-                      required
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-3.5 text-gray-800 font-body focus:outline-none focus:border-[#268C7F] focus:ring-1 focus:ring-[#268C7F]/50 transition-all placeholder:text-gray-400"
-                      placeholder="you@example.com"
-                    />
-                  </div>
-                  <motion.button
-                    whileTap={{ scale: 0.97 }}
-                    disabled={loading}
-                    className="w-full bg-[#268C7F] hover:bg-[#1E7469] text-white font-display font-bold text-lg py-4 rounded-xl shadow-md mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? 'Sending...' : 'Send Reset Link'}
-                  </motion.button>
-                  <div className="text-center mt-6">
-                    <button
-                      type="button"
-                      onClick={() => { setMode('customer'); setMessage(null); }}
-                      className="text-sm font-subheading text-gray-500 hover:text-gray-700 transition-colors"
-                    >
-                      Back to sign in
-                    </button>
-                  </div>
-                </form>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              {loading ? (
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
               ) : (
-                <form action={handleManagerAuth} className="space-y-5">
-                   <div className="text-center mb-6">
-                    <h2 className="font-heading text-2xl text-gray-800 font-bold">
-                      Command Center Access
-                    </h2>
-                    <p className="font-body text-xs text-gray-500 mt-1">
-                      Magic link authentication for staff.
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-display font-bold text-gray-600 uppercase tracking-wider ml-1">Manager Email</label>
-                    <div className="relative">
-                      <input
-                        name="email"
-                        type="email"
-                        required
-                        placeholder="admin@ddskitchen.com"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-3.5 text-gray-800 font-body focus:outline-none focus:border-[#E1803A] focus:ring-1 focus:ring-[#E1803A]/50 transition-all placeholder:text-gray-400"
-                      />
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#E1803A] shadow-lg animate-pulse" />
-                    </div>
-                  </div>
-                  <motion.button
-                    whileTap={{ scale: 0.97 }}
-                    disabled={loading}
-                    className="w-full bg-[#E1803A] hover:bg-[#C86A28] text-white font-display font-bold text-lg py-4 rounded-xl shadow-md mt-6 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-                  >
-                    {loading ? 'Sending link...' : 'Send Magic Link'}
-                  </motion.button>
-                  
-                  {process.env.NODE_ENV === 'development' && (
-                    <motion.button
-                      type="button"
-                      whileTap={{ scale: 0.95 }}
-                      onClick={async () => {
-                        setLoading(true);
-                        const formData = new FormData();
-                        formData.append('email', 'sdheepak62@gmail.com');
-                        formData.append('password', 'ddskitchen123');
-                        const res = await loginClient(formData);
-                        if (res?.error) setMessage({ type: 'error', text: res.error });
-                        else router.push('/admin/dash');
-                        setLoading(false);
-                      }}
-                      className="w-full bg-amber-100 hover:bg-amber-200 text-amber-700 font-display font-bold text-sm py-3 rounded-xl border border-amber-200 mt-4 transition-colors"
-                    >
-                      [DEV] 1-Click Login (sdheepak)
-                    </motion.button>
-                  )}
-                </form>
+                <>
+                  {showForgot ? 'Initialize Reset' : isLogin ? 'Access Portal' : 'Register Member'}
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </>
               )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+            </motion.button>
+
+            <div className="flex flex-col gap-3 pt-6 border-t border-gray-50">
+              <button 
+                type="button" 
+                onClick={() => { setIsLogin(!isLogin); setShowForgot(false); setMessage(null); }}
+                className="text-[10px] font-black uppercase tracking-widest text-[#268C7F] hover:text-[#1E7469] flex items-center justify-center gap-2"
+              >
+                {isLogin ? "Join the Kitchen League" : "Already a Member? Enter"}
+              </button>
+              
+              <button 
+                type="button" 
+                onClick={() => setShowForgot(!showForgot)}
+                className="text-[10px] font-black uppercase tracking-widest text-gray-300 hover:text-gray-500"
+              >
+                {showForgot ? "Back to Login" : "Lost access key?"}
+              </button>
+            </div>
+          </form>
+        </BentoCard>
+
+        {/* Unified "Manager/Admin" info - subtle */}
+        <p className="mt-8 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest opacity-40">
+           Admin Access verified by Profile Identity
+        </p>
       </motion.div>
     </div>
   )
