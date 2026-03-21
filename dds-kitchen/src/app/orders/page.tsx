@@ -2,7 +2,7 @@
 
 import { createClient } from '@/utils/supabase/client'
 import { BentoCard } from '@/components/BentoCard'
-import { CheckCircle2, Clock, ChefHat, PackageCheck, ScrollText, History, Star } from 'lucide-react'
+import { CheckCircle2, Clock, ChefHat, PackageCheck, ScrollText, History, Star, MapPin, Truck } from 'lucide-react'
 import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 
@@ -37,9 +37,12 @@ export default function OrdersPage() {
         case 'confirmed': return 2;
         case 'preparing': return 3;
         case 'ready': return 4;
+        case 'completed': return 5;
+        case 'completed': return 5;
         default: return 0;
      }
   }
+
 
   return (
     <div className="w-full flex flex-col p-6 pb-24 space-y-8">
@@ -89,13 +92,14 @@ export default function OrdersPage() {
 
                 <div className="p-6 relative space-y-8 bg-white/50 backdrop-blur-sm">
                    <div className="absolute left-10 top-8 bottom-8 w-0.5 bg-gray-100 z-0"></div>
-                   <div className="absolute left-10 top-8 bottom-8 w-0.5 bg-[#268C7F] z-0 transition-all duration-1000 origin-top shadow-[0_0_8px_rgba(38,140,127,0.3)]" style={{ height: `${((step - 1) / 3) * 100}%` }}></div>
+                   <div className="absolute left-10 top-8 bottom-8 w-0.5 bg-[#268C7F] z-0 transition-all duration-1000 origin-top shadow-[0_0_8px_rgba(38,140,127,0.3)]" style={{ height: `${((step - 1) / 4) * 100}%` }}></div>
                    
                    {[
-                     { label: 'Market Verification', icon: Clock, target: 1 },
+                     { label: 'Market Verification', icon: ScrollText, target: 1 },
                      { label: 'Chef Confirmed', icon: CheckCircle2, target: 2 },
                      { label: 'Kitchen Orchestration', icon: ChefHat, target: 3 },
-                     { label: 'Ready for Collection', icon: PackageCheck, target: 4 }
+                     { label: 'Live Tracking...', icon: Truck, target: 4 },
+                     { label: 'Ready for Collection', icon: PackageCheck, target: 5 }
                    ].map((item, i) => {
                      const Icon = item.icon
                      const isDone = step >= item.target
@@ -121,7 +125,7 @@ export default function OrdersPage() {
                                 {item.label}
                               </span>
                               {isCurrent && (
-                                <span className="text-[10px] font-black uppercase text-[#268C7F] tracking-widest animate-pulse">Live Tracking...</span>
+                                <span className="text-[10px] font-black uppercase text-[#268C7F] tracking-widest animate-pulse">Present State</span>
                               )}
                            </div>
                         </div>

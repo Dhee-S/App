@@ -62,7 +62,7 @@ export default function OrderPipeline() {
   }
 
   const lanes = [
-    { title: 'Verification', status: ['pending'], icon: ShieldCheck, color: 'text-[#CE9146]', bg: 'bg-[#CE9146]/5', border: 'border-[#CE9146]/20' },
+    { title: 'Incoming', status: ['pending'], icon: ShieldCheck, color: 'text-[#CE9146]', bg: 'bg-[#CE9146]/5', border: 'border-[#CE9146]/20' },
     { title: 'Cooking', status: ['confirmed', 'preparing'], icon: ChefHat, color: 'text-[#E1803A]', bg: 'bg-[#E1803A]/5', border: 'border-[#E1803A]/20' },
     { title: 'Deployment', status: ['ready'], icon: Truck, color: 'text-[#268C7F]', bg: 'bg-[#268C7F]/5', border: 'border-[#268C7F]/20' }
   ]
@@ -165,43 +165,35 @@ export default function OrderPipeline() {
                            </div>
 
                            <div className="pt-2 border-t border-gray-50 flex gap-2">
-                              {order.status === 'pending' ? (
+                              {order.status === 'pending' || order.status === 'confirmed' ? (
                                 <>
-                                  <a href={order.payment_screenshot_url} target="_blank" rel="noreferrer" className="flex-1">
+                                  <a href={order.payment_screenshot_url || '#'} target="_blank" rel="noreferrer" className="flex-1">
                                      <button className="w-full h-11 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 hover:text-[#06B6D4] hover:bg-cyan-50 transition-colors">
                                         <ExternalLink size={16} />
                                      </button>
                                   </a>
                                   <motion.button
                                     whileTap={{ scale: 0.95 }}
-                                    onClick={() => updateStatus(order.id, 'confirmed')}
-                                    className="flex-[3] h-11 bg-[#268C7F] text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-[#268C7F]/20"
+                                    onClick={() => updateStatus(order.id, 'preparing')}
+                                    className="flex-[3] h-11 bg-[#E1803A] text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-[#E1803A]/20"
                                   >
-                                    Verify Settlement
+                                    Accept & Cook
                                   </motion.button>
                                 </>
-                              ) : order.status === 'confirmed' ? (
-                                <MatteButton 
-                                  variant="orange" 
-                                  className="w-full rounded-xl py-3"
-                                  onClick={() => updateStatus(order.id, 'preparing')}
-                                >
-                                  Begin Prep
-                                </MatteButton>
                               ) : order.status === 'preparing' ? (
                                 <MatteButton 
                                   variant="teal" 
                                   className="w-full rounded-xl py-3"
                                   onClick={() => updateStatus(order.id, 'ready')}
                                 >
-                                  Mark Ready
+                                  Deploy & Track
                                 </MatteButton>
                               ) : (
                                 <button 
                                   onClick={() => updateStatus(order.id, 'completed')}
-                                  className="w-full py-3 bg-[#E1803A] text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-[#E1803A]/20 flex items-center justify-center gap-2"
+                                  className="w-full py-3 bg-[#268C7F] text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-[#268C7F]/20 flex items-center justify-center gap-2"
                                 >
-                                  <CheckCircle2 size={16} /> Finalize Mission
+                                  <CheckCircle2 size={16} /> Ready for Collection
                                 </button>
                               )}
                            </div>
