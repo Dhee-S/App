@@ -40,7 +40,7 @@ export default function SchedulePage() {
       const dateStr = format(selectedDate, 'yyyy-MM-dd')
       
       const [schedRes, dishRes] = await Promise.all([
-        supabase.from('schedules').select('*, dishes(*)').eq('scheduled_date', dateStr),
+        supabase.from('schedules').select('*, dishes(*)').eq('scheduled_date', dateStr).eq('status', 'active'),
         supabase.from('dishes').select('*').eq('is_available', true)
       ])
 
@@ -51,7 +51,7 @@ export default function SchedulePage() {
 
     async function fetchSummary() {
       const { data: { user } } = await supabase.auth.getUser()
-      const { data: scheds } = await supabase.from('schedules').select('scheduled_date')
+      const { data: scheds } = await supabase.from('schedules').select('scheduled_date').eq('status', 'active')
       
       let userRequests: any[] = []
       if (user) {

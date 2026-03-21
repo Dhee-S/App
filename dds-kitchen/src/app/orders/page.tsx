@@ -139,16 +139,7 @@ export default function OrdersPage() {
                   </div>
                 )}
 
-                <div className="p-8 relative bg-white/50 backdrop-blur-sm flex flex-col gap-8">
-                   {/* Vertical tracking line positioned correctly to center of 40px icons (left-8 padding + 20px center = left-10 usually, but relative to this container it's left-[20px] -> left-5) */}
-                   <div className="absolute left-[3.25rem] top-12 bottom-12 w-0.5 bg-gray-100 z-0 rounded-full" />
-                   
-                   {/* Animated Progress Line */}
-                   <div 
-                     className="absolute left-[3.25rem] top-12 w-0.5 bg-gradient-to-b from-[#268C7F] to-green-400 z-0 transition-all duration-1000 origin-top shadow-[0_0_12px_rgba(38,140,127,0.5)] rounded-full" 
-                     style={{ height: `calc(${((step - 1) / 4) * 100}% - 1.5rem)` }} 
-                   />
-                   
+                <div className="p-8 relative bg-white/50 backdrop-blur-sm flex flex-col gap-6">
                    {[
                      { label: 'Market Verification', icon: ScrollText, target: 1 },
                      { label: 'Chef Confirmed', icon: CheckCircle2, target: 2 },
@@ -161,24 +152,29 @@ export default function OrdersPage() {
                      const isCurrent = step === item.target
 
                      return (
-                        <div key={i} className={`relative z-10 flex items-center gap-6 transition-all duration-700 ${isDone ? 'opacity-100 translate-x-0' : 'opacity-40 -translate-x-2'}`}>
-                           <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-700 shrink-0 ${
-                             isCurrent ? 'bg-[#268C7F] text-white shadow-lg ring-4 ring-[#268C7F]/10 scale-110' : 
-                             isDone ? 'bg-[#268C7F]/10 text-[#268C7F]' : 'bg-gray-50 border border-gray-100 text-gray-300'
+                        <div key={i} className={`relative z-10 flex items-center gap-5 transition-all duration-700 ${isDone ? 'opacity-100' : 'opacity-30'}`}>
+                           <div className={`w-9 h-9 rounded-2xl flex items-center justify-center transition-all duration-700 shrink-0 ${
+                             isCurrent ? 'bg-white border-2 border-[#268C7F] text-[#268C7F] shadow-sm' : 
+                             isDone ? 'bg-[#268C7F]/10 text-[#268C7F]' : 'bg-gray-50 text-gray-300'
                            }`}>
-                              <Icon size={18} strokeWidth={isCurrent ? 3 : 2} className={isCurrent ? 'animate-bounce' : ''} style={isCurrent ? {animationDuration: '2s'} : {}} />
+                              <Icon size={16} strokeWidth={isCurrent ? 3 : 2} />
                            </div>
                            <div className="flex-1 min-w-0">
-                              <span className={`text-sm tracking-tight block transition-colors duration-500 ${isDone ? 'font-black text-gray-800' : 'font-bold text-gray-400'}`}>
+                              <span className={`text-sm tracking-tight block transition-all duration-500 ${isDone ? 'font-black text-gray-800' : 'font-medium text-gray-400'}`}>
                                 {item.label}
                               </span>
-                              <div className={`overflow-hidden transition-all duration-500 ${isCurrent ? 'h-4 opacity-100 mt-0.5' : 'h-0 opacity-0'}`}>
-                                <span className="text-[9px] font-black uppercase text-[#268C7F] tracking-[0.2em] inline-flex items-center gap-1">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-[#268C7F] animate-ping" />
-                                  Present State
-                                </span>
-                              </div>
+                              {isCurrent && (
+                                <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-1.5 mt-0.5">
+                                   <div className="w-1.5 h-1.5 rounded-full bg-[#268C7F] animate-pulse" />
+                                   <span className="text-[9px] font-black uppercase text-[#268C7F] tracking-widest">Ongoing</span>
+                                </motion.div>
+                              )}
                            </div>
+                           {isDone && !isCurrent && i < step-1 && (
+                             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-[#268C7F]">
+                                <CheckCircle2 size={14} fill="currentColor" className="text-white fill-[#268C7F]/20" />
+                             </motion.div>
+                           )}
                         </div>
                      )
                    })}

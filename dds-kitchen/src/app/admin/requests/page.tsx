@@ -135,6 +135,21 @@ export default function RequestHub({
     fetchKitchenSchedules() // Refresh admin view of schedules
   }
 
+  
+  const finalizeSchedule = async (id: string, name: string) => {
+    const { error } = await supabase
+      .from('schedules')
+      .update({ status: 'completed' })
+      .eq('id', id)
+    
+    if (!error) {
+       showToast(`Batch Finalized: ${name}`, 'success')
+       fetchKitchenSchedules()
+    } else {
+       showToast(`Error: ${error.message}`, 'error')
+    }
+  }
+
   const handleCreateSchedule = async () => {
     if (!scheduleDish) return
     setIsScheduling(true)

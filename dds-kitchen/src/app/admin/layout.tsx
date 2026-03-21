@@ -2,12 +2,21 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { createClient } from '@/utils/supabase/client'
 import { LayoutDashboard, Utensils, CalendarDays, KanbanSquare, LogOut, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
+  const supabase = createClient()
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/auth/login');
+  }
+
+  const supabase = createClient()
 
   const navItems = [
     { label: 'Dash', icon: LayoutDashboard, href: '/admin/dash' },
@@ -76,7 +85,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           {/* Exit Button - Distinctive Style */}
           <button
-            onClick={() => router.push('/')}
+            onClick={handleLogout}
             className="flex flex-col items-center justify-center w-full h-full space-y-1 relative text-gray-400 hover:text-red-500 transition-colors group"
           >
              <div className="relative z-10 p-2 bg-gray-50 rounded-xl group-hover:bg-red-50 transition-colors">
