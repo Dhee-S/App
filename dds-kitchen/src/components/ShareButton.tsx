@@ -14,7 +14,7 @@ interface ShareButtonProps {
 
 export function ShareButton({ 
   title = "DD's Kitchen | Gourmet Homemade", 
-  text = "Experience the Soul of the Kitchen. Small-batch, authentic gourmet meals delivered with verified protocols. Order your lunch/dinner special today!", 
+  text = "Experience the Soul of the Kitchen. Small-batch, authentic gourmet meals. Order your Breakfast, Lunch, Snacks, or Dinner today!", 
   url = "https://ddskitchen.netlify.app/",
   variant = 'minimal'
 }: ShareButtonProps) {
