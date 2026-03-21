@@ -97,22 +97,15 @@ export default function DiscoveryHome() {
 
   return (
     <div className="w-full flex flex-col pb-24">
-      {/* Slideshow Parallax Header - Prioritizing Scheduled Specials */}
+      {/* Slideshow Header: Exclusively Scheduled Specials */}
       <ParallaxHeader 
-        exploreMode={isExploreMode}
-        dishes={scheduledSpecials.length > 0 
-          ? scheduledSpecials.map(s => ({
-              ...s.dishes,
-              id: s.id, // Use schedule ID
-              price: Number(s.dishes.price),
-              scheduled_date: s.scheduled_date,
-              servings_remaining: s.servings_remaining
-            }))
-          : displayFeatured.map(d => ({
-              ...d,
-              price: Number(d.price)
-            }))
-        } 
+        dishes={scheduledSpecials.map(s => ({
+          ...s.dishes,
+          id: s.id,
+          price: Number(s.dishes.price),
+          scheduled_date: s.scheduled_date,
+          servings_remaining: s.servings_remaining
+        }))} 
       />
 
       <div className="p-6 space-y-8">

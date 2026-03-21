@@ -34,18 +34,33 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
   const y = useTransform(scrollY, [0, 300], [0, 80])
   const opacity = useTransform(scrollY, [0, 300], [1, 0.4])
 
-  useEffect(() => {
-    if (dishes.length <= 1) return
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % dishes.length)
-    }, 8000)
-    return () => clearInterval(interval)
-  }, [dishes.length])
+  const defaultSlide = {
+    id: 'brand-welcome',
+    name: "DD's Kitchen",
+    description: "Authentic, Small-Batch Homemade Meals.",
+    price: 0,
+    image_url: "/logo.jpg",
+    category: "Gourmet",
+    scheduled_date: new Date().toISOString(),
+    servings_remaining: 0
+  }
 
-  const currentDish = dishes[index] || dishes[0]
+  const activeDishes = dishes.length > 0 ? dishes : [defaultSlide]
+  const currentDish = activeDishes[index] || activeDishes[0]
+
+  useEffect(() => {
+    if (activeDishes.length <= 1) return
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % activeDishes.length)
+    }, 6000)
+    return () => clearInterval(interval)
+  }, [activeDishes.length])
 
   const handleAddToCart = () => {
-    if (!currentDish) return
+    if (currentDish.id === 'brand-welcome') {
+       window.scrollTo({ top: 600, behavior: 'smooth' })
+       return
+    }
     addItem({
       id: currentDish.id,
       name: currentDish.name,
@@ -55,8 +70,6 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
     showToast(`Added ${currentDish.name} to cart!`, 'success')
   }
 
-  if (!currentDish) return null
-
   return (
     <div ref={ref} className="relative h-[25rem] w-full overflow-hidden shrink-0 rounded-b-[4rem] shadow-2xl z-10 bg-gray-100">
       <AnimatePresence mode="wait">
@@ -65,7 +78,7 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
           initial={{ opacity: 0, scale: 1.1 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 1, ease: [0.19, 1, 0.22, 1] }}
+          transition={{ duration: 0.8 }}
           style={{ y, opacity }}
           className="absolute inset-0 w-full h-full"
         >
@@ -78,15 +91,13 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
               priority
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200" />
+            <div className="w-full h-full bg-gray-100" />
           )}
         </motion.div>
       </AnimatePresence>
       
-      {/* Premium Glass Bottom Overlay */}
-      <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-black/80 via-black/30 to-transparent z-10" />
+      <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
       
-      {/* Content Layer */}
       <div className="absolute inset-x-0 bottom-12 px-8 z-20">
         <motion.div
           key={`content-${currentDish.id}`}
@@ -94,77 +105,71 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-xs space-y-4"
         >
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
              <div className="flex items-center gap-2">
-                <div className="bg-[#268C7F] text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-[0.2em] shadow-lg flex items-center gap-2">
-                  <ChefHat size={10} strokeWidth={3} /> Verified Kitchen Protocol
-                </div>
-                {currentDish.servings_remaining !== undefined && (
-                   <div className="bg-orange-500 text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-[0.2em] shadow-lg flex items-center gap-2 animate-pulse">
-                     <Zap size={10} strokeWidth={3} /> {currentDish.servings_remaining} Left
-                   </div>
+                {currentDish.id === 'brand-welcome' ? (
+                  <div className="bg-[#268C7F] text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-[0.2em]">
+                    Authentic Homemade
+                  </div>
+                ) : (
+                  <>
+                    <div className="bg-[#CE9146] text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-[0.2em] flex items-center gap-2 shadow-lg">
+                      <Sparkles size={10} /> Just Special
+                    </div>
+                    {currentDish.servings_remaining !== undefined && (
+                      <span className="text-white text-[10px] font-black tracking-widest">{currentDish.servings_remaining} Servings Left</span>
+                    )}
+                  </>
                 )}
-             </div>
-
-             {/* Simple Purpose Outline for New Users */}
-             <div className="text-[10px] text-white/50 font-medium uppercase tracking-[0.1em] border-l border-white/20 pl-2">
-                Savor small-batch excellence, direct from our kitchen to your door.
              </div>
           </div>
 
           <div>
-             {currentDish.scheduled_date && (
-                <p className="text-[#CE9146] text-[10px] font-black uppercase tracking-widest mb-1 shadow-sm">
-                   Coming On: {new Date(currentDish.scheduled_date).toLocaleDateString('en-IN', { day:'numeric', month:'short' })}
-                </p>
-             )}
-             <h1 className="text-4xl font-black text-white leading-none tracking-tighter drop-shadow-lg mb-2 capitalize">
-               {exploreMode ? 'Explore Flavors' : currentDish.name}
+             <h1 className="text-4xl font-black text-white leading-none tracking-tighter drop-shadow-lg mb-2">
+               {currentDish.name}
              </h1>
-             {!exploreMode && (
-               <p className="text-white/70 text-[11px] font-medium leading-relaxed italic line-clamp-1 max-w-[80%]">
-                 {currentDish.description}
-               </p>
-             )}
+             <p className="text-white/70 text-[11px] font-medium leading-relaxed italic line-clamp-2 max-w-[90%]">
+               {currentDish.id === 'brand-welcome' 
+                 ? "Our Protocol: Fresh ingredients, Small-batch, High-Trust Delivery."
+                 : currentDish.description}
+             </p>
           </div>
 
           <div className="flex items-center gap-6 pt-2">
-            {!exploreMode ? (
+            {currentDish.id !== 'brand-welcome' ? (
               <>
-                <div className="flex flex-col">
-                   <span className="text-[10px] text-white/40 font-black uppercase tracking-widest mb-1.5">Launch Price</span>
-                   <span className="text-2xl font-black text-white leading-none tabular-nums tracking-tighter">{'₹' + currentDish.price}</span>
+                 <div className="flex flex-col">
+                   <span className="text-[10px] text-[#CE9146] font-black uppercase tracking-widest">Available On</span>
+                   <span className="text-sm font-black text-white">{new Date(currentDish.scheduled_date!).toLocaleDateString('en-IN', { day:'numeric', month:'short' })}</span>
                 </div>
                 <MatteButton size="md" variant="teal" className="rounded-2xl px-12 shadow-xl shadow-[#268C7F]/20" onClick={handleAddToCart}>
                    Claim Now
                 </MatteButton>
               </>
             ) : (
-              <MatteButton size="md" variant="white" className="rounded-2xl px-10 text-[#268C7F] font-black" onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
-                 Begin Experience
-              </MatteButton>
+               <MatteButton size="md" variant="white" className="rounded-2xl px-12 text-[#268C7F] font-black shadow-xl" onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
+                  See Menu
+               </MatteButton>
             )}
           </div>
         </motion.div>
       </div>
 
-      {/* Share Button Integration */}
       <div className="absolute top-6 right-6 z-40">
         <ShareButton variant="minimal" />
       </div>
 
-      {/* Controls */}
-      {dishes.length > 1 && (
+      {activeDishes.length > 1 && (
         <div className="absolute top-1/2 -translate-y-1/2 inset-x-4 flex justify-between z-30 pointer-events-none">
            <button 
-            onClick={() => setIndex((index - 1 + dishes.length) % dishes.length)}
-            className="w-11 h-11 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/50 hover:text-white pointer-events-auto transition-all hover:bg-white/10"
+            onClick={() => setIndex((index - 1 + activeDishes.length) % activeDishes.length)}
+            className="w-11 h-11 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/50 hover:text-white pointer-events-auto transition-all"
            >
              <ChevronLeft size={24} />
            </button>
            <button 
-            onClick={() => setIndex((index + 1) % dishes.length)}
-            className="w-11 h-11 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/50 hover:text-white pointer-events-auto transition-all hover:bg-white/10"
+            onClick={() => setIndex((index + 1) % activeDishes.length)}
+            className="w-11 h-11 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/50 hover:text-white pointer-events-auto transition-all"
            >
              <ChevronRight size={24} />
            </button>
