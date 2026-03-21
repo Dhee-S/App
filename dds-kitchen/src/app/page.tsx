@@ -20,49 +20,41 @@ const sampleDishes = [
   { id: 'sample-5', name: 'Masala Dosa', description: 'Crispy rice pancake with potato filling', price: 8, image_url: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800', is_veg: true, is_available: true, category: 'Breakfast', is_featured: true },
 ]
 
+import useSWR from 'swr'
+
 export default function DiscoveryHome() {
   const supabase = createClient()
-  const [dishes, setDishes] = useState<any[]>([])
-  const [scheduledSpecials, setScheduledSpecials] = useState<any[]>([])
+  const { showToast } = useToast()
+  const addItem = useCart(state => state.addItem)
+  
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [vegOnly, setVegOnly] = useState(false)
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
-  const { showToast } = useToast()
-  
-  const addItem = useCart(state => state.addItem)
   const categories = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Special']
 
-  useEffect(() => {
-    async function fetchDishes() {
-      
-      const todayStr = new Date().toISOString().split('T')[0]
-      const [dishesRes, schedRes] = await Promise.all([
-        supabase
-          .from('dishes')
-          .select('*')
-          .eq('is_available', true)
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('schedules')
-          .select('*, dishes(*)')
-          .gte('scheduled_date', todayStr)
-          .gt('servings_remaining', 0)
-          .order('scheduled_date', { ascending: true })
-      ])
-      
-      if (dishesRes.data && dishesRes.data.length > 0) {
-        setDishes(dishesRes.data)
-      } else {
-        setDishes(sampleDishes)
-      }
-      if (schedRes.data) {
-        setScheduledSpecials(schedRes.data)
-      }
+  // SWR Cache: Dishes - Instant load from local cache on revisit
+  const { data: dishes = sampleDishes } = useSWR('dishes', async () => {
+    const { data } = await supabase
+      .from('dishes')
+      .select('*')
+      .eq('is_available', true)
+      .order('created_at', { ascending: false })
+    
+    return (data && data.length > 0) ? data : sampleDishes
+  }, { revalidateOnFocus: true, refreshInterval: 60000 })
 
-    }
-    fetchDishes()
-  }, [supabase])
+  // SWR Cache: Schedules - Updates silently in background
+  const { data: scheduledSpecials = [] } = useSWR('schedules', async () => {
+    const todayStr = new Date().toISOString().split('T')[0]
+    const { data } = await supabase
+      .from('schedules')
+      .select('*, dishes(*)')
+      .gte('scheduled_date', todayStr)
+      .gt('servings_remaining', 0)
+      .order('scheduled_date', { ascending: true })
+    return data || []
+  }, { revalidateOnFocus: true, refreshInterval: 30000 })
 
   const filteredDishes = dishes.filter(dish => {
     const matchesSearch = dish.name.toLowerCase().includes(search.toLowerCase()) || 

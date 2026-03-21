@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
@@ -19,33 +19,33 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useToast } from '@/components/Toast'
 import Image from 'next/image'
 
+import useSWR from 'swr'
+
 export default function OrderPipeline() {
   const supabase = createClient()
   const { showToast } = useToast()
-  const [orders, setOrders] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
 
-  const fetchOrders = async () => {
+  // SWR Cache: Orders - Instant load from local cache
+  const { data: orders = [], mutate } = useSWR('pipeline-orders', async () => {
     const { data } = await supabase
       .from('orders')
       .select('*, profiles(*), order_items(*, dishes(*))')
       .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
       .order('created_at', { ascending: true })
-    
-    setOrders(data || [])
-    setLoading(false)
-  }
+    return data || []
+  }, { revalidateOnFocus: true, refreshInterval: 10000 })
 
   useEffect(() => {
-    fetchOrders()
-    // Subscribe to changes
+    // Continue using Realtime for zero-latency push updates
     const channel = supabase
       .channel('pipeline-updates')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, fetchOrders)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+        mutate() // Re-fetch through SWR to keep cache synchronized
+      })
       .subscribe()
     
     return () => { supabase.removeChannel(channel) }
-  }, [supabase])
+  }, [supabase, mutate])
 
   
   const approvePayment = async (orderId: string) => {
@@ -55,7 +55,7 @@ export default function OrderPipeline() {
       .eq('id', orderId)
     
     if (!error) {
-       fetchOrders()
+       mutate()
        showToast('Payment Verified! Code generated and sent to customer.', 'success')
     } else {
        showToast(`Error: ${error.message}`, 'error')
@@ -71,7 +71,7 @@ export default function OrderPipeline() {
       .eq('id', orderId)
     
     if (!error) {
-      fetchOrders()
+      mutate()
       showToast(`Order status synchronized to ${status.toUpperCase()}.`, 'success')
     } else {
       showToast(`Protocol error: ${error.message}`, 'error')
