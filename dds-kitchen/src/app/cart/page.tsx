@@ -6,7 +6,7 @@ import { BentoCard } from '@/components/BentoCard'
 import { useCart } from '@/store/useCart'
 import { createClient } from '@/utils/supabase/client'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Minus, Plus, ShieldCheck, X, Check, Loader2 } from 'lucide-react'
+import { Minus, Plus, ShieldCheck, X, Check, Loader2, ArrowRight } from 'lucide-react'
 import { useToast } from '@/components/Toast'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -226,14 +226,50 @@ export default function CartPage() {
                        {isMobile ? (
                          <div className="text-center z-10 w-full space-y-6">
                             <span className="text-5xl block animate-bounce" style={{animationDuration: '3s'}}>📱</span>
-                            <a href={upiLink} className="inline-flex w-full whitespace-nowrap justify-center bg-[#268C7F] text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-[#268C7F]/30 hover:scale-105 transition-transform active:scale-95">
-                               Pay via Any UPI App
-                            </a>
-                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black">GPay • PhonePe • Paytm</p>
+                            
+                            <div className="grid grid-cols-1 gap-3 w-full">
+                               <a 
+                                 href={`upi://pay?pa=${upiId}&pn=${encodeURIComponent("DD's Kitchen")}&am=${total.toFixed(2)}&cu=INR&mode=02&purpose=00`} 
+                                 className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-[#268C7F] active:scale-95 transition-all text-left group"
+                               >
+                                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xs">GPay</div>
+                                  <div className="flex-1">
+                                     <p className="text-[10px] font-black uppercase tracking-widest text-[#268C7F]">Intent Protocol 01</p>
+                                     <p className="text-sm font-bold text-gray-700">Google Pay / Generic UPI</p>
+                                  </div>
+                                  <ArrowRight size={14} className="text-gray-300 group-hover:text-[#268C7F]" />
+                               </a>
+
+                               <a 
+                                 href={`phonepe://pay?pa=${upiId}&pn=${encodeURIComponent("DD's Kitchen")}&am=${total.toFixed(2)}&cu=INR&mode=02&purpose=00`} 
+                                 className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-purple-600 active:scale-95 transition-all text-left group"
+                               >
+                                  <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 font-black text-xs">PH</div>
+                                  <div className="flex-1">
+                                     <p className="text-[10px] font-black uppercase tracking-widest text-purple-500">Intent Protocol 02</p>
+                                     <p className="text-sm font-bold text-gray-700">PhonePe App</p>
+                                  </div>
+                                  <ArrowRight size={14} className="text-gray-300 group-hover:text-purple-600" />
+                               </a>
+
+                               <a 
+                                 href={`paytmmp://pay?pa=${upiId}&pn=${encodeURIComponent("DD's Kitchen")}&am=${total.toFixed(2)}&cu=INR&mode=02&purpose=00`} 
+                                 className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-blue-400 active:scale-95 transition-all text-left group"
+                               >
+                                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-400 font-black text-xs">PY</div>
+                                  <div className="flex-1">
+                                     <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Intent Protocol 03</p>
+                                     <p className="text-sm font-bold text-gray-700">Paytm Digital Wallet</p>
+                                  </div>
+                                  <ArrowRight size={14} className="text-gray-300 group-hover:text-blue-400" />
+                               </a>
+                            </div>
+
+                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black">Tap to launch respective app</p>
                          </div>
                        ) : (
                          <div className="z-10 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
-                            <QRCode value={upiLink} size={150} fgColor="#268C7F" />
+                            <QRCode value={`upi://pay?pa=${upiId}&pn=${encodeURIComponent("DD's Kitchen")}&am=${total.toFixed(2)}&cu=INR&mode=02&purpose=00`} size={150} fgColor="#268C7F" />
                             <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mt-4">Scan using any UPI App</p>
                          </div>
                        )}

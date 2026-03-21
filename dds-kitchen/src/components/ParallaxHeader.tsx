@@ -5,6 +5,7 @@ import { MatteButton } from './MatteButton'
 import { ChevronLeft, ChevronRight, Sparkles, Compass } from 'lucide-react'
 import { useCart } from '@/store/useCart'
 import { useToast } from './Toast'
+import { ShareButton } from './ShareButton'
 
 interface Dish {
   id: string
@@ -146,6 +147,11 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
             )}
           </div>
         </motion.div>
+      </div>
+
+      {/* Share Button Integration */}
+      <div className="absolute top-6 right-6 z-40">
+        <ShareButton variant="minimal" />
       </div>
 
       {/* Controls */}
