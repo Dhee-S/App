@@ -7,7 +7,7 @@ import { MatteButton } from '@/components/MatteButton'
 import { CalendarGrid } from '@/components/CalendarGrid'
 import { format, addDays, isSameDay, parseISO } from 'date-fns'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, User, ChefHat, Check, X, Sparkles, Clock, MapPin, ChevronRight, Utensils, Send, PartyPopper } from 'lucide-react'
+import { Calendar, User, ChefHat, Check, X, Sparkles, Clock, MapPin, ChevronRight, Utensils, Send, PartyPopper, Plus, Search } from 'lucide-react'
 import { useToast } from '@/components/Toast'
 import Image from 'next/image'
 
@@ -26,7 +26,19 @@ export default function RequestHub({
   )
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [requestSummary, setRequestSummary] = useState<any>({})
+  const [requestSummary, setRequestSummary] = useState<Record<string, { status: 'admin_scheduled' | 'accepted_request' | 'pending_request' | 'none' }>>({})
+  
+  // Direct Scheduling State
+  const [showScheduleModal, setShowScheduleModal] = useState(false)
+  const [scheduleDish, setScheduleDish] = useState<any>(null)
+  const [scheduleQty, setScheduleQty] = useState(10)
+  const [availableDishes, setAvailableDishes] = useState<any[]>([])
+  const [isScheduling, setIsScheduling] = useState(false)
+  const [dishSearch, setDishSearch] = useState('')
+
+  const filteredDishes = availableDishes.filter(dish => 
+    dish.name.toLowerCase().includes(dishSearch.toLowerCase())
+  )
 
   const fetchRequests = async () => {
     setLoading(true)
@@ -46,22 +58,32 @@ export default function RequestHub({
   }, [selectedDate, supabase])
 
   useEffect(() => {
-    async function fetchSummary() {
+    async function fetchSummaryAndDishes() {
       const todayStr = format(new Date(), 'yyyy-MM-dd')
-      const { data } = await supabase
-        .from('requests')
-        .select('requested_date, status')
-        .gte('requested_date', todayStr)
+      const [reqsRes, schedsRes, dishesRes] = await Promise.all([
+        supabase.from('requests').select('requested_date, status').gte('requested_date', todayStr),
+        supabase.from('schedules').select('scheduled_date').gte('scheduled_date', todayStr),
+        supabase.from('dishes').select('*').eq('is_available', true)
+      ])
       
-      const summary: any = {}
-      data?.forEach((r: any) => {
-        if (!summary[r.requested_date]) summary[r.requested_date] = {}
-        if (r.status === 'pending') summary[r.requested_date].hasRequests = true
-        if (r.status === 'accepted') summary[r.requested_date].hasSchedule = true
+      const summary: Record<string, { status: 'admin_scheduled' | 'accepted_request' | 'pending_request' | 'none' }> = {}
+      
+      reqsRes.data?.forEach((r: any) => {
+        const currentStatus = summary[r.requested_date]?.status
+        if (currentStatus !== 'admin_scheduled') {
+           if (r.status === 'accepted') summary[r.requested_date] = { status: 'accepted_request' }
+           else if (r.status === 'pending' && currentStatus !== 'accepted_request') summary[r.requested_date] = { status: 'pending_request' }
+        }
       })
+
+      schedsRes.data?.forEach((s: any) => {
+        summary[s.scheduled_date] = { status: 'admin_scheduled' }
+      })
+
       setRequestSummary(summary)
+      setAvailableDishes(dishesRes.data || [])
     }
-    fetchSummary()
+    fetchSummaryAndDishes()
   }, [supabase])
 
   const handleDecision = async (id: string, status: 'accepted' | 'declined') => {
@@ -89,6 +111,34 @@ export default function RequestHub({
     fetchRequests()
   }
 
+  const handleCreateSchedule = async () => {
+    if (!scheduleDish) return
+    setIsScheduling(true)
+    
+    const { error } = await supabase.from('schedules').insert({
+      dish_id: scheduleDish.id,
+      scheduled_date: format(selectedDate, 'yyyy-MM-dd'),
+      is_kitchen_scheduled: true,
+      servings_remaining: scheduleQty
+    })
+    
+    if (!error) {
+      showToast('Scheduled successfully!', 'success')
+      setShowScheduleModal(false)
+      setScheduleDish(null)
+      fetchRequests() 
+      // Re-trigger summary
+      const todayStr = format(new Date(), 'yyyy-MM-dd')
+      const { data } = await supabase.from('schedules').select('scheduled_date').gte('scheduled_date', todayStr)
+      const current = { ...requestSummary }
+      data?.forEach(s => current[s.scheduled_date] = { status: 'admin_scheduled' })
+      setRequestSummary(current)
+    } else {
+      showToast('Failed to schedule: ' + error.message, 'error')
+    }
+    setIsScheduling(false)
+  }
+
   const pending = requests.filter(r => r.status === 'pending')
   const accepted = requests.filter(r => r.status === 'accepted')
 
@@ -108,6 +158,12 @@ export default function RequestHub({
           onSelectDate={setSelectedDate} 
           indicators={requestSummary} 
         />
+      </div>
+
+      <div className="flex justify-center -mt-6 z-20 relative">
+        <MatteButton size="md" variant="teal" className="rounded-2xl" onClick={() => setShowScheduleModal(true)}>
+           <span className="flex items-center gap-2"><Plus size={16} /> Direct Schedule</span>
+        </MatteButton>
       </div>
 
       <div className="flex-1 space-y-8">
@@ -299,6 +355,100 @@ export default function RequestHub({
           </div>
         </section>
       </div>
+
+      {/* Direct Schedule Modal */}
+      <AnimatePresence>
+        {showScheduleModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-xl z-50 flex items-end justify-center p-6"
+            onClick={() => setShowScheduleModal(false)}
+          >
+             <motion.div
+              initial={{ y: 200 }}
+              animate={{ y: 0 }}
+              exit={{ y: 200 }}
+              className="bg-white rounded-[2.5rem] w-full max-w-sm p-8 shadow-2xl relative overflow-hidden flex flex-col max-h-[80vh]"
+              onClick={e => e.stopPropagation()}
+             >
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#268C7F] to-teal-400" />
+                <button 
+                  onClick={() => setShowScheduleModal(false)}
+                  className="absolute top-6 right-6 w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-gray-800 transition-colors"
+                >
+                  <X size={20} />
+                </button>
+
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles size={16} className="text-[#268C7F]" />
+                    <h2 className="text-2xl font-black text-gray-800 tracking-tighter">Plan a Batch</h2>
+                  </div>
+                  <p className="text-xs text-gray-400 font-medium">For {format(selectedDate, 'EEEE, MMMM d')}</p>
+                </div>
+
+                <div className="relative mb-6">
+                   <Search className="absolute left-4 top-3.5 text-gray-300" size={16} />
+                   <input 
+                     className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:border-[#268C7F]" 
+                     placeholder="Search catalog..."
+                     value={dishSearch}
+                     onChange={(e) => setDishSearch(e.target.value)}
+                   />
+                </div>
+
+                <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-hide">
+                   {filteredDishes.map(dish => {
+                      const isSelected = scheduleDish?.id === dish.id
+                      return (
+                        <button 
+                          key={dish.id} 
+                          onClick={() => setScheduleDish(dish)}
+                          className={`w-full p-3 rounded-2xl border transition-all flex items-center gap-3 ${
+                            isSelected ? 'bg-[#268C7F]/5 border-[#268C7F] shadow-sm' : 'bg-white border-gray-100 hover:border-gray-200'
+                          }`}
+                        >
+                           <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0">
+                              {dish.image_url ? <Image src={dish.image_url} alt={dish.name} fill className="object-cover" /> : <div className="bg-gray-100 w-full h-full flex items-center justify-center"><ChefHat size={16} className="text-gray-300" /></div>}
+                           </div>
+                           <div className="text-left flex-1 min-w-0">
+                              <p className="font-bold text-gray-800 text-sm truncate">{dish.name}</p>
+                              <p className="text-[10px] text-[#268C7F] font-black uppercase tracking-tighter">₹{dish.price}</p>
+                           </div>
+                           {isSelected && <Check size={16} className="text-[#268C7F]" />}
+                        </button>
+                      )
+                   })}
+                </div>
+
+                {scheduleDish && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-2xl flex items-center justify-between shrink-0">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Preparation Units</p>
+                    <div className="flex items-center gap-4">
+                      <button type="button" onClick={() => setScheduleQty(Math.max(1, scheduleQty - 1))} className="w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors">-</button>
+                      <span className="font-bold text-gray-800">{scheduleQty}</span>
+                      <button type="button" onClick={() => setScheduleQty(scheduleQty + 1)} className="w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors">+</button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="pt-6">
+                   <MatteButton 
+                    size="md" 
+                    variant="teal" 
+                    className="w-full py-6 rounded-2xl" 
+                    disabled={!scheduleDish || isScheduling}
+                    onClick={handleCreateSchedule}
+                   >
+                      {isScheduling ? 'Orchestrating...' : 'Confirm Schedule'}
+                   </MatteButton>
+                </div>
+             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -19,7 +19,6 @@ export default function CartPage() {
   const [step, setStep] = useState(1)
   const [uploading, setUploading] = useState(false)
   const [copied, setCopied] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const GP_NUMBER = '7904935160'
 
@@ -39,10 +38,7 @@ export default function CartPage() {
     setStep(1)
   }
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    
+  const handleCheckoutSubmit = async () => {
     setUploading(true)
     
     try {
@@ -54,34 +50,14 @@ export default function CartPage() {
         return
       }
 
-      let screenshotUrl = null
-      
-      try {
-        const fileExt = file.name.split('.').pop()
-        const fileName = `${user.id}-${Date.now()}.${fileExt}`
-        const filePath = `payments/${fileName}`
-        
-        const { error: uploadError } = await supabase.storage
-          .from('dds-kitchen')
-          .upload(filePath, file)
-
-        if (!uploadError) {
-          const { data: { publicUrl } } = supabase.storage
-            .from('dds-kitchen')
-            .getPublicUrl(filePath)
-          screenshotUrl = publicUrl
-        }
-      } catch (storageErr) {
-        console.log('Storage upload skipped:', storageErr)
-      }
-
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
           user_id: user.id,
           total_amount: total,
           status: 'pending',
-          payment_screenshot_url: screenshotUrl
+          payment_screenshot_url: null,
+          is_paid: false
         })
         .select()
         .single()
@@ -100,8 +76,18 @@ export default function CartPage() {
           quantity: item.quantity,
           unit_price: item.price
         })
-        if (itemError) {
-          console.error('Item error:', itemError)
+
+        if (!itemError && item.schedule_id) {
+           const { data: schedule } = await supabase.from('schedules')
+             .select('servings_remaining')
+             .eq('id', item.schedule_id)
+             .single()
+             
+           if (schedule) {
+             await supabase.from('schedules').update({
+               servings_remaining: Math.max(0, schedule.servings_remaining - item.quantity)
+             }).eq('id', item.schedule_id)
+           }
         }
       }
 
@@ -109,7 +95,7 @@ export default function CartPage() {
       setTimeout(() => {
         setIsCheckingOut(false)
         clearCart()
-        showToast('Order placed! Verification in progress.', 'success')
+        showToast('Order placed! Verification pending.', 'success')
         window.location.href = '/App/orders'
       }, 2000)
 
@@ -120,21 +106,6 @@ export default function CartPage() {
     
     setUploading(false)
   }
-
-  const handleUploadClick = () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleUpload = () => {
-    // Simulate upload
-      setStep(3)
-      setTimeout(() => {
-        setIsCheckingOut(false)
-        clearCart()
-        showToast('Transaction received. Verification in progress.', 'success')
-        window.location.href = '/App/orders'
-      }, 2000)
-    }
 
   if (items.length === 0 && !isCheckingOut) {
     return (
@@ -292,50 +263,10 @@ export default function CartPage() {
                        </p>
                     </div>
 
-                    <MatteButton size="md" variant="teal" className="w-full" onClick={() => setStep(2)}>
-                       I've Paid {'₹' + total.toFixed(2)}
+                    <MatteButton size="md" variant="teal" className="w-full flex justify-center items-center gap-2" onClick={handleCheckoutSubmit} disabled={uploading}>
+                       {uploading ? <Loader2 size={16} className="animate-spin" /> : "I've Paid " + '₹' + total.toFixed(2)}
                     </MatteButton>
                   </div>
-                )}
-
-                {step === 2 && (
-                   <div className="text-center space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                      <div>
-                        <h2 className="text-2xl font-black text-gray-800 tracking-tighter">Confirm Batch</h2>
-                        <p className="text-sm text-gray-400 font-medium mt-1">Upload your payment capture</p>
-                      </div>
-
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileSelect}
-                        className="hidden"
-                      />
-
-                      <div 
-                        onClick={handleUploadClick}
-                        className="border-2 border-dashed border-[#E1803A]/30 rounded-[2rem] p-10 text-center bg-[#E1803A]/5 hover:bg-[#E1803A]/10 transition-all cursor-pointer group"
-                      >
-                         {uploading ? (
-                           <div className="w-16 h-16 bg-white rounded-2xl mx-auto shadow-md flex items-center justify-center text-[#E1803A] mb-4">
-                             <Loader2 size={28} className="animate-spin" />
-                           </div>
-                         ) : (
-                           <>
-                             <div className="w-16 h-16 bg-white rounded-2xl mx-auto shadow-md flex items-center justify-center text-[#E1803A] mb-4 group-hover:scale-110 transition-transform">
-                                <Camera size={28} />
-                             </div>
-                             <span className="text-sm font-black text-gray-700">Tap to Upload Proof</span>
-                             <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-widest font-bold">Screenshot / Photo</p>
-                           </>
-                         )}
-                      </div>
-
-                      <p className="text-[10px] text-gray-400 italic">
-                         By uploading, you agree to the gourmet terms of service.
-                      </p>
-                   </div>
                 )}
 
                 {step === 3 && (
@@ -344,7 +275,7 @@ export default function CartPage() {
                          <Check size={40} strokeWidth={3} />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-black text-gray-800 tracking-tighter">Verification Sent</h2>
+                        <h2 className="text-2xl font-black text-gray-800 tracking-tighter">Verification Pending</h2>
                         <p className="text-sm text-gray-400 font-medium mt-2">Checking with the Command Center...</p>
                       </div>
                    </div>

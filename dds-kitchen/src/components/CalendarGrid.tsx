@@ -12,7 +12,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 export interface CalendarGridProps {
   selectedDate: Date;
   onSelectDate: (date: Date) => void;
-  indicators?: Record<string, { hasSchedule?: boolean, hasRequests?: boolean }>;
+  indicators?: Record<string, { status: 'admin_scheduled' | 'accepted_request' | 'pending_request' | 'none' }>;
 }
 
 export function CalendarGrid({ selectedDate, onSelectDate, indicators = {} }: CalendarGridProps) {
@@ -130,12 +130,34 @@ export function CalendarGrid({ selectedDate, onSelectDate, indicators = {} }: Ca
                   </span>
                   
                   {/* Indicators */}
-                  <div className="absolute bottom-1.5 flex gap-1">
-                    {indicator?.hasSchedule && (
-                      <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white' : 'bg-[#E1803A]'}`} />
+                  <div className="absolute top-1.5 right-1.5 flex gap-1">
+                    {indicator?.status === 'admin_scheduled' && (
+                      <motion.div 
+                        initial={{ scale: 0 }} 
+                        animate={{ scale: 1 }} 
+                        className="w-2.5 h-2.5 rounded-full bg-[#E1803A] border border-white shadow-sm flex items-center justify-center"
+                        title="Admin Scheduled"
+                      >
+                         <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
+                      </motion.div>
                     )}
-                    {indicator?.hasRequests && (
-                      <div className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white/70' : 'bg-[#268C7F]'}`} />
+                    {indicator?.status === 'accepted_request' && (
+                      <motion.div 
+                        initial={{ scale: 0 }} 
+                        animate={{ scale: 1 }} 
+                        className="w-2.5 h-2.5 rounded-full bg-green-500 border border-white shadow-sm flex items-center justify-center"
+                        title="Request Accepted"
+                      >
+                      </motion.div>
+                    )}
+                    {indicator?.status === 'pending_request' && (
+                      <motion.div 
+                        initial={{ scale: 0 }} 
+                        animate={{ scale: 1 }} 
+                        className="w-2.5 h-2.5 rounded-full bg-amber-400 border border-white shadow-sm flex items-center justify-center opacity-80 animate-bounce"
+                        title="User Requested"
+                      >
+                      </motion.div>
                     )}
                   </div>
                 </button>

@@ -26,7 +26,7 @@ export default function SchedulePage() {
   const [requesting, setRequesting] = useState(false)
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
   const [requestQty, setRequestQty] = useState(1)
-  const [daySummary, setDaySummary] = useState<{ [key: string]: { hasSchedule: boolean } }>({})
+  const [daySummary, setDaySummary] = useState<Record<string, { status: 'admin_scheduled' | 'accepted_request' | 'pending_request' | 'none' }>>({})
   const [dishSearch, setDishSearch] = useState('')
 
   const filteredDishes = availableDishes.filter(dish => 
@@ -49,12 +49,29 @@ export default function SchedulePage() {
     }
 
     async function fetchSummary() {
+      const { data: { user } } = await supabase.auth.getUser()
       const { data: scheds } = await supabase.from('schedules').select('scheduled_date')
       
-      const summary: any = {}
-      scheds?.forEach(s => {
-        summary[s.scheduled_date] = { hasSchedule: true }
+      let userRequests: any[] = []
+      if (user) {
+        const { data: reqs } = await supabase.from('requests').select('requested_date, status').eq('user_id', user.id)
+        userRequests = reqs || []
+      }
+
+      const summary: Record<string, { status: 'admin_scheduled' | 'accepted_request' | 'pending_request' | 'none' }> = {}
+      
+      userRequests.forEach(r => {
+        const currentStatus = summary[r.requested_date]?.status
+        if (currentStatus !== 'admin_scheduled') {
+           if (r.status === 'accepted') summary[r.requested_date] = { status: 'accepted_request' }
+           else if (r.status === 'pending' && currentStatus !== 'accepted_request') summary[r.requested_date] = { status: 'pending_request' }
+        }
       })
+
+      scheds?.forEach(s => {
+        summary[s.scheduled_date] = { status: 'admin_scheduled' }
+      })
+      
       setDaySummary(summary)
     }
 
@@ -67,7 +84,8 @@ export default function SchedulePage() {
       id: schedule.dishes.id,
       name: schedule.dishes.name,
       price: Number(schedule.dishes.price),
-      image_url: schedule.dishes.image_url
+      image_url: schedule.dishes.image_url,
+      schedule_id: schedule.id
     })
     setAddedIds(prev => new Set(prev).add(schedule.id))
     showToast(`${schedule.dishes.name} added to cart!`, 'success')
