@@ -13,8 +13,8 @@ interface ShareButtonProps {
 }
 
 export function ShareButton({ 
-  title = "DD's Kitchen", 
-  text = "Check out these amazing gourmet dishes from DD's Kitchen!", 
+  title = "DD's Kitchen | Gourmet Homemade", 
+  text = "Experience the Soul of the Kitchen. Small-batch, authentic gourmet meals delivered with verified protocols. Order your lunch/dinner special today!", 
   url = "https://ddskitchen.netlify.app/",
   variant = 'minimal'
 }: ShareButtonProps) {
