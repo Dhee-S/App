@@ -26,6 +26,7 @@ export default function RequestHub({
   )
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [mounted, setMounted] = useState(false)
   const [requestSummary, setRequestSummary] = useState<Record<string, { status: 'admin_scheduled' | 'accepted_request' | 'pending_request' | 'none' }>>({})
   
   // Direct Scheduling State
@@ -82,6 +83,7 @@ export default function RequestHub({
 
       setRequestSummary(summary)
       setAvailableDishes(dishesRes.data || [])
+      setMounted(true)
     }
     fetchSummaryAndDishes()
   }, [supabase])
@@ -141,6 +143,8 @@ export default function RequestHub({
 
   const pending = requests.filter(r => r.status === 'pending')
   const accepted = requests.filter(r => r.status === 'accepted')
+
+  if (!mounted) return null
 
   return (
     <div className="min-h-screen pt-12 px-6 pb-32 mesh-bg flex flex-col space-y-8">

@@ -26,7 +26,7 @@ export default function AuthCallbackPage() {
               .eq('id', user.id)
               .single()
 
-            if (profile?.role === 'MANAGER') {
+            if (profile?.role === 'MANAGER' && next !== '/auth/reset-password') {
               router.replace('/admin/dash')
               return
             }

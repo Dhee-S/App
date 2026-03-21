@@ -21,6 +21,7 @@ export default function SchedulePage() {
   const [kitchenSchedules, setKitchenSchedules] = useState<any[]>([])
   const [availableDishes, setAvailableDishes] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [mounted, setMounted] = useState(false)
   const [showRequestModal, setShowRequestModal] = useState(false)
   const [requestDish, setRequestDish] = useState<any>(null)
   const [requesting, setRequesting] = useState(false)
@@ -77,6 +78,7 @@ export default function SchedulePage() {
 
     fetchData()
     fetchSummary()
+    setMounted(true)
   }, [selectedDate, supabase])
 
   const handleInstantBuy = (schedule: any) => {
@@ -128,6 +130,8 @@ export default function SchedulePage() {
   }
 
   const hasItems = kitchenSchedules.length > 0
+
+  if (!mounted) return null
 
   return (
     <div className="w-full flex flex-col p-6 pb-24 space-y-8 mesh-bg min-h-screen">
