@@ -247,7 +247,6 @@ export default function CartPage() {
                                       <Zap size={18} strokeWidth={3} />
                                    </div>
                                    <div className="flex-1">
-                                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#268C7F] mb-0.5">Intent Protocol 01</p>
                                       <p className="text-sm font-black text-gray-800">Choose Payment Option</p>
                                    </div>
                                    <ArrowRight size={16} strokeWidth={3} className="text-gray-300 group-hover:text-[#268C7F]" />
