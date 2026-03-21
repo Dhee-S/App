@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { MatteButton } from '@/components/MatteButton'
 import { BentoCard } from '@/components/BentoCard'
 import { useCart } from '@/store/useCart'
 import { createClient } from '@/utils/supabase/client'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Trash2, Plus, Minus, Camera, ShieldCheck, X, Check, Upload, Loader2, Copy, Phone } from 'lucide-react'
+import { Minus, Plus, ShieldCheck, X, Check, Loader2 } from 'lucide-react'
 import { useToast } from '@/components/Toast'
 import Image from 'next/image'
 import Link from 'next/link'
+import QRCode from 'react-qr-code'
 
 export default function CartPage() {
   const { items, removeItem, addItem, totalPrice, clearCart } = useCart()
@@ -18,20 +19,16 @@ export default function CartPage() {
   const [isCheckingOut, setIsCheckingOut] = useState(false)
   const [step, setStep] = useState(1)
   const [uploading, setUploading] = useState(false)
-  const [copied, setCopied] = useState(false)
+  const [isMobile, setIsMobile] = useState(true)
 
-  const GP_NUMBER = '7904935160'
-
-  const handleCopyNumber = async () => {
-    await navigator.clipboard.writeText(GP_NUMBER)
-    setCopied(true)
-    showToast('Phone number copied!', 'success')
-    setTimeout(() => setCopied(false), 2000)
-  }
+  useEffect(() => {
+    setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
+  }, [])
 
   const subtotal = totalPrice()
   const fees = items.length > 0 ? 5.00 : 0
   const total = subtotal + fees
+  const upiLink = `upi://pay?pa=7904935160@ybl&pn=DD_KITCHEN&am=${total.toFixed(2)}&cu=INR`
 
   const handleCheckout = () => {
     setIsCheckingOut(true)
@@ -55,18 +52,14 @@ export default function CartPage() {
         .insert({
           user_id: user.id,
           total_amount: total,
-          status: 'pending',
-          payment_screenshot_url: null,
+          status: 'pending_verification', // High-Trust zero-step skip directly to pending_verification
           is_paid: false
         })
         .select()
         .single()
 
       if (orderError) {
-        console.error('Order error:', orderError)
-        showToast('Failed to create order: ' + orderError.message, 'error')
-        setUploading(false)
-        return
+        throw new Error(orderError.message)
       }
 
       for (const item of items) {
@@ -95,7 +88,7 @@ export default function CartPage() {
       setTimeout(() => {
         setIsCheckingOut(false)
         clearCart()
-        showToast('Order placed! Verification pending.', 'success')
+        showToast('Order Placed! Awaiting Verification.', 'success')
         window.location.href = '/App/orders'
       }, 2000)
 
@@ -196,7 +189,7 @@ export default function CartPage() {
         </MatteButton>
       </div>
 
-      {/* Payment Loop Modal Overlay */}
+      {/* Trust-Based Payment Loop Modal */}
       <AnimatePresence>
         {isCheckingOut && (
           <motion.div 
@@ -213,7 +206,7 @@ export default function CartPage() {
              >
                 <button 
                   onClick={() => setIsCheckingOut(false)}
-                  className="absolute top-6 right-6 w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-gray-800 transition-colors"
+                  className="absolute top-6 right-6 w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-gray-800 transition-colors z-20"
                 >
                   <X size={20} />
                 </button>
@@ -222,44 +215,32 @@ export default function CartPage() {
                   <div className="text-center space-y-6">
                     <div>
                       <h2 className="text-2xl font-black text-gray-800 tracking-tighter">Settlement</h2>
-                      <p className="text-sm text-gray-400 font-medium mt-1">Pay via GPay</p>
+                      <p className="text-sm text-gray-400 font-medium mt-1">Zero-Friction Gateway</p>
                     </div>
-                    
-                    <button
-                      onClick={handleCopyNumber}
-                      className="bg-gray-50 rounded-2xl p-4 flex items-center justify-between group hover:bg-[#268C7F]/5 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#268C7F] rounded-xl flex items-center justify-center">
-                          <Phone size={18} className="text-white" />
-                        </div>
-                        <div className="text-left">
-                          <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Phone</p>
-                          <p className="text-lg font-black text-gray-800">+91 {GP_NUMBER}</p>
-                        </div>
-                      </div>
-                      <motion.div
-                        whileTap={{ scale: 0.9 }}
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                          copied ? 'bg-green-500 text-white' : 'bg-white text-gray-400 group-hover:text-[#268C7F]'
-                        }`}
-                      >
-                        {copied ? <Check size={18} /> : <Copy size={18} />}
-                      </motion.div>
-                    </button>
 
-                    <div className="w-48 h-48 bg-gray-50 rounded-3xl mx-auto border-4 border-dashed border-gray-100 p-6 relative group overflow-hidden">
-                       <div className="w-full h-full bg-white rounded-2xl shadow-inner flex items-center justify-center relative overflow-hidden">
-                          <div className="absolute inset-0 bg-gradient-to-br from-[#268C7F]/10 to-transparent" />
-                          <span className="text-4xl">📱</span>
-                       </div>
-                       <div className="absolute inset-0 bg-[#268C7F]/5 animate-pulse rounded-3xl" />
+                    <div className="bg-gray-50 rounded-3xl p-6 mx-auto border-4 border-dashed border-gray-100 flex flex-col items-center justify-center relative overflow-hidden min-h-[14rem]">
+                       <div className="absolute inset-0 bg-gradient-to-br from-[#268C7F]/5 to-transparent" />
+                       
+                       {isMobile ? (
+                         <div className="text-center z-10 w-full space-y-6">
+                            <span className="text-5xl block animate-bounce" style={{animationDuration: '3s'}}>📱</span>
+                            <a href={upiLink} className="inline-flex w-full whitespace-nowrap justify-center bg-[#268C7F] text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-[#268C7F]/30 hover:scale-105 transition-transform active:scale-95">
+                               Pay via Any UPI App
+                            </a>
+                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black">GPay • PhonePe • Paytm</p>
+                         </div>
+                       ) : (
+                         <div className="z-10 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
+                            <QRCode value={upiLink} size={150} fgColor="#268C7F" />
+                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mt-4">Scan using any UPI App</p>
+                         </div>
+                       )}
                     </div>
 
                     <div className="bg-gray-50 rounded-2xl p-4 flex items-center gap-3 text-left">
                        <ShieldCheck className="text-[#268C7F] shrink-0" size={24} />
                        <p className="text-[11px] text-gray-500 font-medium leading-relaxed">
-                          Your order remains <span className="text-gray-800 font-bold uppercase">Pending</span> until the Chef verifies your transaction proof.
+                          We operate on a <span className="text-[#268C7F] font-black uppercase tracking-widest text-[10px]">High-Trust Protocol</span>. Once paid, simply confirm below.
                        </p>
                     </div>
 
@@ -271,12 +252,12 @@ export default function CartPage() {
 
                 {step === 3 && (
                    <div className="text-center py-12 space-y-6 animate-in zoom-in-95 duration-500">
-                      <div className="w-20 h-20 bg-green-500 rounded-full mx-auto flex items-center justify-center text-white shadow-xl shadow-green-200">
+                      <div className="w-20 h-20 bg-[#268C7F] rounded-full mx-auto flex items-center justify-center text-white shadow-xl shadow-[#268C7F]/30">
                          <Check size={40} strokeWidth={3} />
                       </div>
                       <div>
                         <h2 className="text-2xl font-black text-gray-800 tracking-tighter">Verification Pending</h2>
-                        <p className="text-sm text-gray-400 font-medium mt-2">Checking with the Command Center...</p>
+                        <p className="text-sm text-gray-400 font-medium mt-2">Connecting to Command Center...</p>
                       </div>
                    </div>
                 )}

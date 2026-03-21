@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/client'
 import { BentoCard } from '@/components/BentoCard'
 import { CheckCircle2, Clock, ChefHat, PackageCheck, ScrollText, History, Star, MapPin, Truck } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 
@@ -11,7 +12,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchOrders = async () => {
       const { data: { user } } = await supabase.auth.getUser()
 
@@ -26,6 +27,16 @@ export default function OrdersPage() {
     }
 
     fetchOrders()
+
+    const channel = supabase.channel('realtime-orders')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, (payload) => {
+         fetchOrders()
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [supabase])
 
   const activeOrders = orders?.filter(o => !['completed', 'cancelled'].includes(o.status)) || []
@@ -85,23 +96,48 @@ export default function OrdersPage() {
             const step = getStatusStep(order.status)
             return (
               <BentoCard key={order.id} className="p-0 border-gray-100 shadow-xl shadow-black/[0.04] overflow-hidden">
-                <div className="p-6 bg-white flex justify-between items-center border-b border-gray-50 relative overflow-hidden">
-                   <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#268C7F] to-teal-400" />
-                   <div>
-                      <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-1">Settlement Total</p>
-                       <p className="text-3xl font-black text-[#268C7F] tracking-tighter">
-                         {'₹' + order.total_amount}
-                       </p>
-                   </div>
-                   <div className="text-right">
-                      <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-1">Passcode</p>
-                       <div className={`px-4 py-2 flex items-center justify-center rounded-xl transition-all duration-700 ${order.delivery_code ? 'bg-[#268C7F]/10 text-[#268C7F]' : 'bg-gray-50 border border-gray-100 text-gray-300'}`}>
-                         <span className="font-mono font-black tracking-widest text-sm">
-                            {order.delivery_code || 'PENDING'}
-                         </span>
-                      </div>
-                   </div>
-                </div>
+                {order.is_paid && order.delivery_code ? (
+                  <div className="p-8 bg-[#268C7F] text-white flex flex-col items-center justify-center text-center relative overflow-hidden z-20">
+                     <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent" />
+                     <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-4 shadow-xl backdrop-blur-md">
+                        <CheckCircle2 size={32} strokeWidth={3} className="text-white drop-shadow-md" />
+                     </motion.div>
+                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 mb-2">Auth Code Generated</p>
+                     <h2 className="text-5xl font-serif text-white mb-4 drop-shadow-xl tracking-wider">{order.delivery_code}</h2>
+                     <p className="text-sm font-subheading italic text-white/90 mb-6 max-w-[250px] leading-relaxed">
+                       Payment Confirmed! Show this code to the Chef at pickup—made with heart.
+                     </p>
+                     <button onClick={() => {
+                        if (navigator.share) {
+                          navigator.share({ title: 'DD Kitchen Pickup', text: `My Order Code is ${order.delivery_code}` })
+                        } else {
+                          navigator.clipboard.writeText(order.delivery_code);
+                          alert('Code copied to clipboard!');
+                        }
+                     }} className="bg-white text-[#268C7F] px-6 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2">
+                        Share Pickup Details
+                     </button>
+                  </div>
+                ) : (
+                  <div className="p-6 bg-white flex justify-between items-center border-b border-gray-50 relative overflow-hidden">
+                     <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-orange-400 to-amber-300" />
+                     <div>
+                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-1">Settlement Total</p>
+                         <p className="text-3xl font-black text-gray-800 tracking-tighter">
+                           {'₹' + order.total_amount}
+                         </p>
+                     </div>
+                     <div className="text-right">
+                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] mb-1">Verification</p>
+                         <div className="px-4 py-2 flex items-center justify-center rounded-xl transition-all duration-700 bg-orange-50 border border-orange-100 text-orange-500 shadow-inner">
+                           <span className="font-black uppercase tracking-widest text-[10px] flex items-center gap-2">
+                              <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+                              Pending
+                           </span>
+                        </div>
+                     </div>
+                  </div>
+                )}
 
                 <div className="p-8 relative bg-white/50 backdrop-blur-sm flex flex-col gap-8">
                    {/* Vertical tracking line positioned correctly to center of 40px icons (left-8 padding + 20px center = left-10 usually, but relative to this container it's left-[20px] -> left-5) */}
