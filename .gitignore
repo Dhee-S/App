@@ -1,5 +1,36 @@
-.gemini/
-node_modules/
+# Dependencies (for all projects)
+/node_modules/
+
+# Environment variables - NEVER commit
 .env
 .env.local
+.env.*.local
+
+# Build outputs
+.next/
+out/
+dist/
+
+# IDE
 .DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+Thumbs.db
+
+# Project-specific
+.dds-kitchen/node_modules/
+.dds-kitchen/.next/
+.dds-kitchen/out/
+.dds-kitchen/*.js
+.dds-kitchen/*.html
+.dds-kitchen/*.txt
+.dds-kitchen/*.md
+.dds-kitchen/ts_errors*.txt
+.dds-kitchen/stitch/
+.dds-kitchen/SKILL/

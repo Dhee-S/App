@@ -285,7 +285,7 @@ export default function SchedulePage() {
                         </motion.button>
                       ) : (
                         <button 
-                          onClick={() => window.location.href = `https://wa.me/917904935160?text=I'd like to book ${schedule.dishes?.name} for ${schedule.scheduled_date}`}
+                          onClick={() => window.location.href = `https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_PHONE || ''}?text=I'd like to book ${schedule.dishes?.name} for ${schedule.scheduled_date}`}
                          className="text-[10px] font-black text-[#268C7F] uppercase tracking-widest border border-[#268C7F]/20 px-4 py-2 rounded-xl hover:bg-[#268C7F]/5 transition-colors flex items-center gap-1"
                         >
                           Contact <MessageCircleHeart size={12} />

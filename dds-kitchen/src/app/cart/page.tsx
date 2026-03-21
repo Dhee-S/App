@@ -28,7 +28,8 @@ export default function CartPage() {
   const subtotal = totalPrice()
   const fees = items.length > 0 ? 5.00 : 0
   const total = subtotal + fees
-  const upiLink = `upi://pay?pa=7904935160@ybl&pn=DD_KITCHEN&am=${total.toFixed(2)}&cu=INR`
+  const upiId = process.env.NEXT_PUBLIC_UPI_ID || ''
+  const upiLink = `upi://pay?pa=${upiId}&pn=DD_KITCHEN&am=${total.toFixed(2)}&cu=INR`
 
   const handleCheckout = () => {
     setIsCheckingOut(true)

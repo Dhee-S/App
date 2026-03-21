@@ -54,14 +54,14 @@ export function Footer() {
           
           <div className="grid grid-cols-1 gap-2.5">
             <motion.div whileHover={{ scale: 1.01 }}>
-              <a href="tel:+917904935160" className="block">
+              <a href={`tel:+${process.env.NEXT_PUBLIC_SUPPORT_PHONE || ''}`} className="block">
                 <BentoCard className="p-4 flex items-center gap-3 hover:bg-white transition-all border-none shadow-md ring-1 ring-black/[0.02] group">
                   <div className="w-9 h-9 rounded-xl bg-[#E1803A]/10 flex items-center justify-center text-[#E1803A] group-hover:bg-[#E1803A] group-hover:text-white transition-colors">
                     <Phone size={16} />
                   </div>
                   <div className="flex-1">
                     <p className="text-[8px] font-black uppercase tracking-widest text-gray-400">Contact Kitchen</p>
-                    <p className="text-sm font-bold text-gray-700">+91 79049 35160</p>
+                    <p className="text-sm font-bold text-gray-700">{process.env.NEXT_PUBLIC_SUPPORT_PHONE_DISPLAY || 'Phone Support'}</p>
                   </div>
                   <ArrowRight size={14} className="text-gray-300 group-hover:text-[#E1803A] transition-colors" />
                 </BentoCard>
@@ -95,7 +95,7 @@ export function Footer() {
           <div className="flex items-center justify-center gap-3">
             <motion.a
               whileHover={{ scale: 1.1, y: -2 }}
-              href="https://wa.me/917904935160"
+              href={`https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_PHONE || ''}`}
               target="_blank"
               rel="noreferrer"
               className="w-12 h-12 rounded-full bg-[#25D366] shadow-lg flex items-center justify-center text-white"
