@@ -5,10 +5,11 @@ import { BentoCard } from '@/components/BentoCard'
 import { ParallaxHeader } from '@/components/ParallaxHeader'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Plus, Check, Sparkles } from 'lucide-react'
+import { Search, Plus, Check, Sparkles, Calendar as CalendarIcon } from 'lucide-react'
 import { useCart } from '@/store/useCart'
 import { createClient } from '@/utils/supabase/client'
 import { useToast } from '@/components/Toast'
+import { format, parseISO } from 'date-fns'
 import { Footer } from '@/components/Footer'
 
 const sampleDishes = [
@@ -22,6 +23,7 @@ const sampleDishes = [
 export default function DiscoveryHome() {
   const supabase = createClient()
   const [dishes, setDishes] = useState<any[]>([])
+  const [scheduledSpecials, setScheduledSpecials] = useState<any[]>([])
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [vegOnly, setVegOnly] = useState(false)
@@ -33,17 +35,31 @@ export default function DiscoveryHome() {
 
   useEffect(() => {
     async function fetchDishes() {
-      const { data } = await supabase
-        .from('dishes')
-        .select('*')
-        .eq('is_available', true)
-        .order('created_at', { ascending: false })
       
-      if (data && data.length > 0) {
-        setDishes(data)
+      const todayStr = new Date().toISOString().split('T')[0]
+      const [dishesRes, schedRes] = await Promise.all([
+        supabase
+          .from('dishes')
+          .select('*')
+          .eq('is_available', true)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('schedules')
+          .select('*, dishes(*)')
+          .gte('scheduled_date', todayStr)
+          .gt('servings_remaining', 0)
+          .order('scheduled_date', { ascending: true })
+      ])
+      
+      if (dishesRes.data && dishesRes.data.length > 0) {
+        setDishes(dishesRes.data)
       } else {
         setDishes(sampleDishes)
       }
+      if (schedRes.data) {
+        setScheduledSpecials(schedRes.data)
+      }
+
     }
     fetchDishes()
   }, [supabase])
@@ -138,7 +154,58 @@ export default function DiscoveryHome() {
           </div>
         </div>
 
+        
+        {/* Scheduled Kitchen Specials */}
+        {scheduledSpecials.length > 0 && (selectedCategory === 'All' || selectedCategory === 'Special') && (
+        <div className="space-y-4 mb-8">
+          <div className="flex justify-between items-end">
+             <h2 className="text-xs font-display font-black text-[#E1803A] uppercase tracking-[0.2em] flex items-center gap-2">
+               <Sparkles size={14} /> Scheduled Specials
+             </h2>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+             {scheduledSpecials.map((sched, idx) => (
+               <BentoCard key={'sched-'+sched.id} className="p-4 flex gap-4 group relative overflow-hidden bg-gradient-to-r from-orange-50 to-white border-orange-100 shadow-sm">
+                 <div className="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0">
+                   {sched.dishes?.image_url ? (
+                     <Image src={sched.dishes.image_url} alt={sched.dishes.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
+                   ) : (
+                     <div className="w-full h-full bg-orange-100 flex items-center justify-center text-orange-300 italic text-xs">No Glimpse</div>
+                   )}
+                 </div>
+                 <div className="flex-1 min-w-0 flex flex-col justify-center">
+                   <h3 className="font-display font-bold text-lg text-gray-800 line-clamp-1">{sched.dishes?.name}</h3>
+                   <div className="flex items-center gap-3 mt-2">
+                     <span className="text-[10px] font-black uppercase text-orange-500 tracking-widest flex items-center gap-1 bg-orange-100/50 px-2 py-1 rounded-lg">
+                       <CalendarIcon size={12} /> {format(parseISO(sched.scheduled_date), 'MMM d, yyyy')}
+                     </span>
+                     <span className="text-[10px] font-black uppercase tracking-widest text-[#268C7F] bg-[#268C7F]/10 px-2 py-1 rounded-lg">
+                       {sched.servings_remaining} Left
+                     </span>
+                   </div>
+                   <div className="flex items-center justify-between mt-3">
+                     <p className="text-[#268C7F] font-black text-xl tracking-tighter tabular-nums">{'₹' + sched.dishes?.price}</p>
+                     <motion.button
+                        whileTap={{ scale: 0.8 }}
+                        onClick={() => handleAddToCart(sched.dishes)}
+                        className={`h-8 px-4 rounded-xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
+                          addedIds.has(sched.dishes?.id) 
+                            ? 'bg-green-500 text-white' 
+                            : 'bg-[#E1803A] text-white shadow-lg shadow-[#E1803A]/20 hover:shadow-xl'
+                        }`}
+                      >
+                        {addedIds.has(sched.dishes?.id) ? 'Confirmed' : 'Add to Order'}
+                      </motion.button>
+                   </div>
+                 </div>
+               </BentoCard>
+             ))}
+          </div>
+        </div>
+        )}
+
         {/* The Dish Grid */}
+
         <div className="space-y-6">
           <div className="flex justify-between items-end">
              <h2 className="text-xs font-display font-black text-gray-400 uppercase tracking-[0.2em]">{selectedCategory} Selection</h2>
