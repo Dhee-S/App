@@ -16,7 +16,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push('/auth/login');
   }
 
-  const supabase = createClient()
 
   const navItems = [
     { label: 'Dash', icon: LayoutDashboard, href: '/admin/dash' },
