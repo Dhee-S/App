@@ -59,22 +59,33 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
 
   return (
     <div ref={ref} className="relative h-[25rem] w-full overflow-hidden shrink-0 rounded-b-[4rem] shadow-2xl z-10 bg-gray-100">
-      <AnimatePresence mode="wait">
+      <AnimatePresence initial={false} custom={index}>
         <motion.div 
-          key={currentDish.id}
-          initial={{ opacity: 0, scale: 1.1 }}
+          key={index}
+          custom={index}
+          initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.8 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6 }}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          onDragEnd={(_, info) => {
+            if (info.offset.x > 50) {
+              setIndex((index - 1 + activeDishes.length) % activeDishes.length)
+            } else if (info.offset.x < -50) {
+              setIndex((index + 1) % activeDishes.length)
+            }
+          }}
           style={{ y, opacity }}
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
         >
           {currentDish.image_url ? (
             <Image
               src={currentDish.image_url}
               alt={currentDish.name}
               fill
-              className="object-cover"
+              className="object-cover pointer-events-none"
               priority
             />
           ) : (
