@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { MatteButton } from './MatteButton'
-import { ChevronLeft, ChevronRight, Sparkles, Compass } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Sparkles, Compass, ChefHat, Zap } from 'lucide-react'
 import { useCart } from '@/store/useCart'
 import { useToast } from './Toast'
 import { ShareButton } from './ShareButton'
@@ -15,6 +15,8 @@ interface Dish {
   image_url: string | null
   category: string
   is_veg?: boolean
+  scheduled_date?: string
+  servings_remaining?: number
 }
 
 interface ParallaxHeaderProps {
@@ -56,14 +58,14 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
   if (!currentDish) return null
 
   return (
-    <div ref={ref} className="relative h-[24rem] w-full overflow-hidden shrink-0 rounded-b-[3.5rem] shadow-2xl z-10 bg-gray-100">
+    <div ref={ref} className="relative h-[25rem] w-full overflow-hidden shrink-0 rounded-b-[4rem] shadow-2xl z-10 bg-gray-100">
       <AnimatePresence mode="wait">
         <motion.div 
           key={currentDish.id}
-          initial={{ opacity: 0, scale: 1.15 }}
+          initial={{ opacity: 0, scale: 1.1 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ duration: 1.4, ease: [0.19, 1, 0.22, 1] }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 1, ease: [0.19, 1, 0.22, 1] }}
           style={{ y, opacity }}
           className="absolute inset-0 w-full h-full"
         >
@@ -80,69 +82,66 @@ export function ParallaxHeader({ dishes, exploreMode }: ParallaxHeaderProps) {
           )}
         </motion.div>
       </AnimatePresence>
-
-      {/* Premium Overlays */}
-      <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
       
-      {/* Content */}
-      <div className="absolute inset-x-0 bottom-10 px-8 z-20">
+      {/* Premium Glass Bottom Overlay */}
+      <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-black/80 via-black/30 to-transparent z-10" />
+      
+      {/* Content Layer */}
+      <div className="absolute inset-x-0 bottom-12 px-8 z-20">
         <motion.div
           key={`content-${currentDish.id}`}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="max-w-xs"
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-xs space-y-4"
         >
-          <div className="flex items-center gap-3 mb-4">
-             {exploreMode ? (
-               <div className="bg-[#268C7F] text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-[0.2em] shadow-lg flex items-center gap-2">
-                 <Compass size={12} strokeWidth={3} className="animate-spin-slow" /> Discover Flavors
-               </div>
-             ) : (
-               <div className="bg-[#E1803A] text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-[0.2em] shadow-lg flex items-center gap-2">
-                 <Sparkles size={12} strokeWidth={3} /> Today's Special
-               </div>
+          <div className="flex flex-col gap-2">
+             <div className="flex items-center gap-2">
+                <div className="bg-[#268C7F] text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-[0.2em] shadow-lg flex items-center gap-2">
+                  <ChefHat size={10} strokeWidth={3} /> Verified Kitchen Protocol
+                </div>
+                {currentDish.servings_remaining !== undefined && (
+                   <div className="bg-orange-500 text-white text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-[0.2em] shadow-lg flex items-center gap-2 animate-pulse">
+                     <Zap size={10} strokeWidth={3} /> {currentDish.servings_remaining} Left
+                   </div>
+                )}
+             </div>
+
+             {/* Simple Purpose Outline for New Users */}
+             <div className="text-[10px] text-white/50 font-medium uppercase tracking-[0.1em] border-l border-white/20 pl-2">
+                Savor small-batch excellence, direct from our kitchen to your door.
+             </div>
+          </div>
+
+          <div>
+             {currentDish.scheduled_date && (
+                <p className="text-[#CE9146] text-[10px] font-black uppercase tracking-widest mb-1 shadow-sm">
+                   Coming On: {new Date(currentDish.scheduled_date).toLocaleDateString('en-IN', { day:'numeric', month:'short' })}
+                </p>
              )}
-             {currentDish.is_veg !== undefined && (
-               <div className={`w-2.5 h-2.5 rounded-full border border-white/40 ${currentDish.is_veg ? 'bg-green-500' : 'bg-red-500'} shadow-[0_0_8px] ${currentDish.is_veg ? 'shadow-green-500/40' : 'shadow-red-500/40'}`} />
-             )}
-             {dishes.length > 1 && (
-               <div className="flex gap-1.5 ml-1">
-                 {dishes.map((_, i) => (
-                   <div key={i} className={`h-1 rounded-full transition-all duration-700 ${i === index ? 'w-5 bg-white' : 'w-1 bg-white/30'}`} />
-                 ))}
-               </div>
+             <h1 className="text-4xl font-black text-white leading-none tracking-tighter drop-shadow-lg mb-2 capitalize">
+               {exploreMode ? 'Explore Flavors' : currentDish.name}
+             </h1>
+             {!exploreMode && (
+               <p className="text-white/70 text-[11px] font-medium leading-relaxed italic line-clamp-1 max-w-[80%]">
+                 {currentDish.description}
+               </p>
              )}
           </div>
 
-          <h1 className="text-4xl font-black text-white leading-[0.9] tracking-tighter mb-3 drop-shadow-2xl">
-            {exploreMode ? 'Explore the Menu' : currentDish.name}
-          </h1>
-          {!exploreMode && (
-            <p className="text-white/70 text-xs font-subheading italic line-clamp-2 max-w-[90%] mb-8 leading-relaxed">
-              {currentDish.description}
-            </p>
-          )}
-          {exploreMode && (
-            <p className="text-white/70 text-xs font-subheading italic mb-8 leading-relaxed">
-              Handpicked culinary trajectories just for you.
-            </p>
-          )}
-
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 pt-2">
             {!exploreMode ? (
               <>
                 <div className="flex flex-col">
-                   <span className="text-[10px] text-white/50 font-black uppercase tracking-widest mb-1.5">Price</span>
-                   <span className="text-2xl font-black text-white leading-none tabular-nums tracking-tighter shadow-sm">{'₹' + currentDish.price}</span>
+                   <span className="text-[10px] text-white/40 font-black uppercase tracking-widest mb-1.5">Launch Price</span>
+                   <span className="text-2xl font-black text-white leading-none tabular-nums tracking-tighter">{'₹' + currentDish.price}</span>
                 </div>
-                <MatteButton size="md" variant="teal" className="rounded-2xl px-10 shadow-xl" onClick={handleAddToCart}>
-                   Experience
+                <MatteButton size="md" variant="teal" className="rounded-2xl px-12 shadow-xl shadow-[#268C7F]/20" onClick={handleAddToCart}>
+                   Claim Now
                 </MatteButton>
               </>
             ) : (
-              <MatteButton size="md" variant="white" className="rounded-2xl px-12 text-[#268C7F] font-black shadow-xl" onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
-                 Start Order
+              <MatteButton size="md" variant="white" className="rounded-2xl px-10 text-[#268C7F] font-black" onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
+                 Begin Experience
               </MatteButton>
             )}
           </div>
