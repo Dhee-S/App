@@ -14,7 +14,8 @@ import {
   ArrowRight,
   UtensilsCrossed,
   XCircle,
-  Clock
+  Clock,
+  LogOut
 } from 'lucide-react'
 import { MatteButton } from '@/components/MatteButton'
 import { useRouter } from 'next/navigation'
@@ -50,6 +51,12 @@ export default function AdminDashboard() {
     fetchMetrics()
   }, [supabase])
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    showToast('Session securely terminated.', 'info')
+    router.push('/login')
+  }
+
   const stats = [
     { label: 'Revenue', value: `₹${metrics.totalRevenue.toFixed(0)}`, icon: TrendingUp, color: 'text-[#268C7F]', bg: 'bg-[#268C7F]/5' },
     { label: 'Verify', value: metrics.pendingPayments, icon: Package, color: 'text-[#E1803A]', bg: 'bg-[#E1803A]/5', alert: metrics.pendingPayments > 0 },
@@ -73,11 +80,19 @@ export default function AdminDashboard() {
           <h1 className="text-4xl font-black text-gray-800 tracking-tighter shiny-text">Command Center</h1>
         </div>
         
-        <div className="relative group">
-           <div className="absolute inset-0 bg-[#CE9146]/20 rounded-2xl blur-lg group-hover:blur-xl transition-all" />
-           <button className="relative w-12 h-12 bg-white rounded-2xl border border-gray-100 flex items-center justify-center text-[#CE9146] shadow-sm">
-              <Sparkles size={20} strokeWidth={2.5} />
-           </button>
+        <div className="flex gap-2">
+          <div className="relative group">
+             <div className="absolute inset-0 bg-[#CE9146]/20 rounded-2xl blur-lg group-hover:blur-xl transition-all" />
+             <button className="relative w-12 h-12 bg-white rounded-2xl border border-gray-100 flex items-center justify-center text-[#CE9146] shadow-sm">
+                <Sparkles size={20} strokeWidth={2.5} />
+             </button>
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="w-12 h-12 bg-white rounded-2xl border border-gray-100 flex items-center justify-center text-red-400 hover:bg-red-50 transition-colors shadow-sm"
+          >
+            <LogOut size={20} strokeWidth={2.5} />
+          </button>
         </div>
       </header>
 
