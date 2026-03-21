@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { loginClient, signupClient, forgotPasswordClient } from '@/utils/supabase/auth-client'
-import { Sparkles, ArrowRight, User, Key, Mail, Utensils } from 'lucide-react'
+import Image from 'next/image'
+import { Sparkles, ArrowRight, User, Key, Mail } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -64,8 +65,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[100dvh] w-full flex flex-col justify-center items-center p-6 bg-[#F8F9FA] relative font-jakarta">
-      {/* Absolute Simplification: No complex gradients or blur blobs */}
-      
       <motion.div 
         initial={{ opacity: 0, y: 10 }} 
         animate={{ opacity: 1, y: 0 }} 
@@ -75,12 +74,18 @@ export default function LoginPage() {
           <motion.div 
             initial={{ scale: 0.9 }} 
             animate={{ scale: 1 }} 
-            className="w-16 h-16 bg-white rounded-3xl shadow-sm border border-gray-100 flex items-center justify-center mx-auto mb-4"
+            className="w-32 h-32 bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-center mx-auto mb-4 relative overflow-hidden"
           >
-            <Utensils className="text-[#268C7F]" size={28} />
+            <Image 
+              src="/logo.jpg" 
+              alt="DD's Kitchen Logo" 
+              fill 
+              className="object-contain p-2"
+              priority
+            />
           </motion.div>
           <h1 className="text-4xl font-black text-gray-800 tracking-tighter mb-1 font-trirong">DD's Kitchen</h1>
-          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Secure Member Portal</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#268C7F]">Gourmet Marketplace</p>
         </header>
 
         <div className="bg-white rounded-[2.5rem] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-50">

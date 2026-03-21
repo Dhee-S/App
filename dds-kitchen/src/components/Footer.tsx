@@ -3,6 +3,7 @@
 import { Phone, MapPin, MessageSquare, ChefHat, Heart, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { BentoCard } from './BentoCard'
+import Image from 'next/image'
 
 export function Footer() {
   return (
@@ -28,9 +29,14 @@ export function Footer() {
               <div className="flex gap-4 items-center">
                 <motion.div 
                   whileHover={{ scale: 1.05, rotate: 5 }}
-                  className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#268C7F]/20 to-[#E1803A]/20 flex items-center justify-center text-2xl shadow-inner"
+                  className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center shadow-inner relative overflow-hidden p-1"
                 >
-                  👩‍🍳
+                  <Image 
+                    src="/logo.jpg" 
+                    alt="DD's Kitchen" 
+                    fill 
+                    className="object-contain" 
+                  />
                 </motion.div>
                 <div className="flex-1">
                   <h3 className="text-lg font-black text-gray-800 tracking-tight">Ponnukodi S</h3>
