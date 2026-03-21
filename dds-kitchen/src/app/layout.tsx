@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   title: "DD's Kitchen",
   description: "Gourmet Marketplace & Kitchen Schedule",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/logo.jpg",
+    shortcut: "/logo.jpg",
+    apple: "/logo.jpg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

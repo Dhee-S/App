@@ -80,7 +80,7 @@ export default function LoginPage() {
               src="/logo.jpg" 
               alt="DD's Kitchen Logo" 
               fill 
-              className="object-contain p-2"
+              className="object-cover"
               priority
             />
           </motion.div>
