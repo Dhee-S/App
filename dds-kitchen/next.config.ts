@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // output: 'export',
-  // basePath: '/App',
+  output: 'export',
+  basePath: '/App',
   trailingSlash: true,
   images: {
     unoptimized: true,

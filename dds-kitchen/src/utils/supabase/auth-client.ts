@@ -27,7 +27,7 @@ export async function signupClient(formData: FormData) {
       data: {
         full_name: fullName,
       },
-      emailRedirectTo: `https://ddskitchen.netlify.app/auth/callback/`,
+      emailRedirectTo: `https://dhee-s.github.io/App/auth/callback/`,
     }
   })
 
@@ -52,7 +52,7 @@ export async function sendMagicLinkClient(formData: FormData) {
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `https://ddskitchen.netlify.app/auth/callback/`,
+      emailRedirectTo: `https://dhee-s.github.io/App/auth/callback/`,
     },
   })
 
@@ -65,7 +65,7 @@ export async function forgotPasswordClient(formData: FormData) {
   const email = formData.get('email') as string
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `https://ddskitchen.netlify.app/auth/callback/?next=/auth/reset-password/`,
+    redirectTo: `https://dhee-s.github.io/App/auth/callback/?next=/auth/reset-password/`,
   })
 
   if (error) return { error: error.message }
