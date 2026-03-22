@@ -32,7 +32,7 @@ export function Footer() {
                   className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center shadow-inner relative overflow-hidden p-1"
                 >
                   <Image 
-                    src="/logo.jpg" 
+                    src="/App/logo.jpg" 
                     alt="DD's Kitchen" 
                     fill 
                     className="object-contain" 

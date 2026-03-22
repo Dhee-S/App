@@ -2,15 +2,15 @@
   "name": "DD's Kitchen",
   "short_name": "DDKitchen",
   "description": "Gourmet Marketplace & Kitchen Schedule",
-  "start_url": "/",
+  "start_url": "/App/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#268C7F",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "/App/logo.jpg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg"
     }
   ]
 }

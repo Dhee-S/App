@@ -11,11 +11,11 @@ const merriweather = Merriweather({ subsets: ['latin'], weight: ['300', '400', '
 export const metadata: Metadata = {
   title: "DD's Kitchen",
   description: "Gourmet Marketplace & Kitchen Schedule",
-  manifest: "/manifest.json",
+  manifest: "/App/manifest.json",
   icons: {
-    icon: "/logo.jpg",
-    shortcut: "/logo.jpg",
-    apple: "/logo.jpg",
+    icon: "/App/logo.jpg",
+    shortcut: "/App/logo.jpg",
+    apple: "/App/logo.jpg",
   },
   appleWebApp: {
     capable: true,
