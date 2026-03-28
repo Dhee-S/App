@@ -85,7 +85,7 @@ export default function OrdersPage() {
              </div>
              <p className="text-[10px] font-black uppercase tracking-widest text-gray-300">No live batches currently.</p>
              <button 
-               onClick={() => window.location.href = '/App/'}
+               onClick={() => window.location.href = '/'}
                className="mt-6 border border-[#268C7F]/20 text-[#268C7F] px-6 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#268C7F]/5 transition-colors"
              >
                Discover Menu
