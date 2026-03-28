@@ -1,80 +1,60 @@
-# 👨‍🍳 DD's Kitchen (V2: High-Trust Protocol)
-> A premium, full-stack mobile web-app for zero-friction gourmet deliveries.
+# 👨‍🍳 DD's Kitchen — V2: High-Trust Protocol
+> A premium, **zero-friction** gourmet delivery platform architected for the high-trust economy.
 
-![Next.js](https://img.shields.io/badge/Developed%20with-Next.js-000000?style=for-the-badge&logo=next.js)
-![Supabase](https://img.shields.io/badge/Backend-Supabase-3ECF8E?style=for-the-badge&logo=supabase)
-![Tailwind](https://img.shields.io/badge/UI-Tailwind%20CSS-06B6D4?style=for-the-badge&logo=tailwind-css)
-![Security](https://img.shields.io/badge/Security-Hardened-268C7F?style=for-the-badge&logo=shieldcheck)
-
----
-
-## ⚡ The V2 Vision: Zero Friction, High Trust
-This platform is architected for the **"High-Trust"** economy—removing traditional payment bottlenecks and replacing them with native mobile workflows.
-
-### 💎 Key Features
-- **🚀 Zero-Cost UPI Intents**: One-tap deep-linking into GPay, PhonePe, and Paytm. No clunky screenshot uploads!
-- **🔐 Server-Side Delivery Codes**: Unique 4-digit codes generated autonomously by **PostgreSQL Triggers** in Supabase for secure order handovers.
-- **🛰️ Realtime Tracking**: Active `Supabase.channel` listeners that reveal your delivery code instantly upon admin verification.
-- **📱 Mobile-First UI**: A "Sober Luxury" design system featuring glassmorphic cards and Framer-Motion micro-animations.
+[![Live Demo](https://img.shields.io/badge/Live-Demo-268C7F?style=for-the-badge&logo=vercel)](https://ddskitchen.vercel.app/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Supabase](https://img.shields.io/badge/Backend-Supabase-3ECF8E?style=for-the-badge&logo=supabase)](https://supabase.com/)
+[![Built with AI](https://img.shields.io/badge/Orchestrated%20by-Antigravity-orange?style=for-the-badge&logo=openai)](https://github.com/google-deepmind)
 
 ---
 
+## 💎 The V2 Vision: Sober Luxury & High-Trust
+DD's Kitchen is not just an ordering app; it's a **High-Trust Protocol**. We've removed the traditional friction of payment screenshots and manual verifications by implementing native mobile workflows and autonomous backend orchestration.
 
-# 👨‍🍳 DD's Kitchen (V2: High-Trust Protocol)
-> Live: [ddskitchen.netlify.app](https://ddskitchen.netlify.app/)
-
-... (The rest of your professional documentation) ...
-
-## 📱 Mobile Native Status
-- ✅ **Web App**: LIVE & Optimized.
-- 🚧 **Mobile native**: PWA Manifest enabled for "Add to Home Screen" support.
-
- 
----
-
-## 🏗️ Architecture & Stack
-### **Frontend Layer**
-- **Next.js 16 (App Router)**: Optimized for SEO and lightning-fast edge performance.
-- **Framer Motion**: Smooth, high-frequency layout transitions and icon animations.
-- **Lucide Icons**: Crisp, native-feel iconography for mobile users.
-
-### **Backend Layer**
-- **Supabase PostgreSQL**: Managed database with identity-based Auth.
-- **DB Triggers**: Real-time server-side logic for order processing.
-- **Netlify Edge**: Deployed on Netlify's global CDN for sub-100ms latency.
+### 🍱 Project Preview: The "Sober Luxury" Aesthetic
+Built using a custom **Stitch Bento** design system, the UI features:
+*   **Matte Deep Slate Surfaces**: High-radius cards with subtle grain overlays.
+*   **Glassmorphism**: Translucent headers and navigation bars that feel native to iOS and Android.
+*   **Micro-Animations**: High-frequency layout transitions powered by **Framer Motion** that mimic haptic feedback.
 
 ---
 
-## 🔒 Security Audit: Zero-Leak Policy
-The repository is strictly configured to protect your business and personal credentials:
-- ✅ **Environment Variables**: Hardcoded phone numbers and UPI IDs are 100% removed.
-- ✅ **Secure Git**: `.env.local` files are forced into [.gitignore](cci:7://file:///d:/Code/App/.gitignore:0:0-0:0) to prevent any accidental pushes.
-- ✅ **Internal Logic**: All deployment scripts and temporary modification tools are wiped from production.
+## ⚡ Key Specializations
+
+### 🚀 Zero-Cost UPI Intents
+Instead of clunky payment gateways, we use **Direct UPI Intent Deep-linking**. One tap opens GPay, PhonePe, or Paytm instantly.
+
+### 🔐 Server-Side Delivery Codes
+Unique 4-digit pickup codes are generated autonomously via **PostgreSQL Triggers** in Supabase ONLY after payment is verified by the admin. 
+
+### 🛰️ Realtime Kitchen Pipeline
+The kitchen staff uses a zero-latency dashboard where orders move across lanes (**Incoming → Cooking → Ready**) via active `Supabase.channel` listeners.
 
 ---
 
-## 🚥 Deployment Roadmap
-1. **GitHub Import**: Connect this repository to your Netlify profile.
-2. **Base Folder**: Set `Base directory` to `dds-kitchen`.
-3. **Env Setup**: Securely enter your `NEXT_PUBLIC_UPI_ID` and `NEXT_PUBLIC_SUPPORT_PHONE` in the Netlify dashboard.
-4. **Live**: Your app builds and deploys in < 3 minutes on every `git push`.
+## 🤖 Orchestrated by AI
+This entire codebase was built, debugged, and optimized using **Antigravity**, a powerful agentic AI coding platform.
+*   **Architecture**: Optimized for Next.js App Router and Supabase SSR.
+*   **Speed**: Built from prototype to production build in record time.
+*   **Hardened Logic**: All database triggers, Row Level Security (RLS) policies, and middleware were AI-audited.
 
 ---
 
-## ✨ The Vibe Coding Workflow
-This application was architected using a modern, AI-assisted **Vibe Coding** methodology to ensure high-fidelity design and bulletproof backend logic:
-
-| 🦾 Tool | 🔨 Role |
-| :--- | :--- |
-| **🚀 Antigravity (Advanced AI Agent)** | The primary builder, orchestrating the full-stack code, security, and deployment cycles. |
-| **🍱 Stitch Bento** | The foundation for the stunning, glassmorphic Bento-style front-end architecture. |
-| **🏀 Dribbble** | The source of UI/UX inspiration for the "Sober Luxury" and iPhone Minimalist aesthetic. |
-| **💻 Opencode Terminal** | The high-performance assist terminal used to orchestrate the build and run AI commands. |
+## 🛠️ The Tech Stack
+*   **Frontend**: Next.js 16 (React 19), Framer Motion, Lucide Icons.
+*   **Backend**: Supabase (PostgreSQL, Realtime, Auth).
+*   **Styling**: Modern Tailwind CSS 4.0 + Custom Utility Tokens.
+*   **Mobile**: Capacitor 8.2 (Full Mobile-Native Compatibility).
+*   **Hosting**: Vercel (Production) & GitHub Pages (Build CI/CD).
 
 ---
 
-## 🎨 Inspired Design System
-- **Surfaces**: Matte Deep Slate cards with 24px radius.
-- **Contrast**: Soft grain overlays with vibrant accent pops (#268C7F & #E1803A).
-- **Feel**: Native-grade mobile interactions with Haptic-mimicking micro-animations.
+## 🚦 Getting Started
+1.  **Visit the Live Site**: [ddskitchen.vercel.app](https://ddskitchen.vercel.app/)
+2.  **Explore the Menu**: Discover daily curated chef specials.
+3.  **Order**: Experience the zero-friction UPI flow.
+4.  **Track**: Watch your order move through the kitchen in real-time.
 
+---
+
+*Created with ❤️ by **DD's Kitchen** & Orchestrated by **Antigravity AI***
