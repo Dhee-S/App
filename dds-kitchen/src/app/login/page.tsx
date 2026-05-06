@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
-import { loginClient, signupClient, forgotPasswordClient } from '@/utils/supabase/auth-client'
+import { loginClient, signupClient, forgotPasswordClient, loginWithGoogle } from '@/utils/firebase-auth-client'
 import Image from 'next/image'
 import { Sparkles, ArrowRight, User, Key, Mail, ChefHat } from 'lucide-react'
 import { BentoCard } from '@/components/BentoCard'
@@ -18,14 +18,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
 
-  const checkRoleAndRedirect = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
+  const checkRoleAndRedirect = async (userId: string) => {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', user.id)
+      .eq('id', userId)
       .single()
 
     if (profile?.role === 'MANAGER') {
@@ -53,14 +50,11 @@ export default function LoginPage() {
     if (res?.error) {
        setMessage({ type: 'error', text: res.error })
        setLoading(false)
+    } else if (res?.user) {
+       await checkRoleAndRedirect(res.user.uid)
     } else {
-       const { data: { session } } = await supabase.auth.getSession()
-       if (session) {
-          await checkRoleAndRedirect()
-       } else {
-          setMessage({ type: 'success', text: 'Verification link sent to your inbox.' })
-          setLoading(false)
-       }
+       setMessage({ type: 'success', text: 'Success! Redirecting...' })
+       setLoading(false)
     }
   }
 
@@ -198,11 +192,47 @@ export default function LoginPage() {
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <span className="relative z-10">{showForgot ? 'Reset Protocol' : isLogin ? 'Access Kitchen' : 'Continue discovery'}</span>
+                  <span className="relative z-10">{showForgot ? 'Reset Password' : isLogin ? 'Sign In' : 'Sign Up'}</span>
                   <ArrowRight size={16} className="group-hover:translate-x-1.5 transition-transform relative z-10" />
                 </>
               )}
             </motion.button>
+
+            {isLogin && !showForgot && (
+              <>
+                <div className="relative flex py-2 items-center">
+                  <div className="flex-grow border-t border-gray-100/50"></div>
+                  <span className="flex-shrink-0 mx-4 text-gray-400 text-[10px] font-black tracking-widest uppercase">Or</span>
+                  <div className="flex-grow border-t border-gray-100/50"></div>
+                </div>
+
+                <motion.button
+                  type="button"
+                  whileTap={{ scale: 0.97 }}
+                  disabled={loading}
+                  onClick={async () => {
+                    setLoading(true);
+                    const res = await loginWithGoogle();
+                    if (res?.error) {
+                      setMessage({ type: 'error', text: res.error });
+                      setLoading(false);
+                    } else if (res?.user) {
+                      await checkRoleAndRedirect(res.user.uid);
+                    }
+                  }}
+                  className="w-full bg-white text-gray-800 py-6 rounded-[1.8rem] text-[12px] font-black uppercase tracking-[0.2em] shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-gray-100 hover:bg-gray-50 disabled:opacity-50 transition-all flex items-center justify-center gap-3 group relative overflow-hidden"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                    <path fill="none" d="M1 1h22v22H1z" />
+                  </svg>
+                  <span className="relative z-10">Sign in with Google</span>
+                </motion.button>
+              </>
+            )}
 
             <div className="flex flex-col gap-5 pt-8 border-t border-gray-50 text-center">
               <button 
@@ -210,7 +240,7 @@ export default function LoginPage() {
                 onClick={() => { setIsLogin(!isLogin); setShowForgot(false); setMessage(null); }}
                 className="text-[11px] font-black uppercase tracking-[0.3em] text-[#268C7F] hover:opacity-100 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
               >
-                {isLogin ? "Join the Kitchen" : "Back to Protocol"}
+                {isLogin ? "Sign Up" : "Back to Sign In"}
                 <ChefHat size={14} className="opacity-40" />
               </button>
               
@@ -219,7 +249,7 @@ export default function LoginPage() {
                 onClick={() => setShowForgot(!showForgot)}
                 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300 hover:text-gray-400 transition-colors"
               >
-                {showForgot ? "Cancel" : "Forgot Credentials?"}
+                {showForgot ? "Cancel" : "Forgot Password?"}
               </button>
             </div>
           </form>

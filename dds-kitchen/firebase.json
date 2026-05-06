@@ -1,0 +1,10 @@
+{
+  "auth": {
+    "providers": {
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "DDs Kitchen",
+        "supportEmail": "sdheepak62@gmail.com"
+      }
+    }
+  }
+}
